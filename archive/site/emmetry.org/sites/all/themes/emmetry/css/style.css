@@ -1,0 +1,193 @@
+header .logo img {
+	max-height: 45px;
+}
+header#page-header {
+	text-align: center;
+	height: 28px;
+	border-bottom: 1px solid #01be07;
+	vertical-align: middle;
+	margin-bottom: 2em;
+	font-size: 12px;
+	font-style: italic;
+	font-family: 'Cinzel Decorative', cursive;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+.navigation {
+	/*background-image: -webkit-linear-gradient(top, #47744b, #01be07);*/
+	border-bottom: 1px solid #01be07;
+}
+.navbar #block-search-form {
+	width: 25%;
+	float: right !important;
+}
+body {
+	
+}
+h1 {
+	font-family: 'Cinzel Decorative', cursive;
+	text-transform: uppercase;
+}
+h2.block-title {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 200;
+	font-size: 1.7em;
+	text-align: right;
+}
+h3 {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 200;
+	font-size: 1.2em;
+}
+article {
+	position: relative;
+}
+article div.field:not(.field-name-field-picture) {
+	max-width: 65%;
+	margin-bottom: 0.6em;
+}
+article .field-name-field-picture,
+article .field-name-field-image {
+	position: absolute; 
+	right: 0px;
+	top: 0px;
+	padding: 10px;
+	border: 1px solid #e8e7e9;
+	max-width: 25%;
+	-webkit-transition-property: all;
+	-moz-transition-property: all;
+	-o-transition-property: all;
+	-ms-transition-property: all;
+	transition-property: all;
+	-webkit-transition-duration: 0.37s;
+	-moz-transition-duration: 0.37s;
+	-o-transition-duration: 0.37s;
+	-ms-transition-duration: 0.37s;
+	border: 1px solid #e8e7e9;
+	transition-duration: 0.37s;
+	
+}
+article .field-type-image img {
+	max-width: 100%;
+	height: auto;
+}
+article .field-name-field-picture:hover {
+	box-shadow: 0px 4px 13px rgba(0,0,0,0.4);	
+	-webkit-transition-property: all;
+	-moz-transition-property: all;
+	-o-transition-property: all;
+	-ms-transition-property: all;
+	transition-property: all;
+	-webkit-transition-duration: 0.37s;
+	-moz-transition-duration: 0.37s;
+	-o-transition-duration: 0.37s;
+	-ms-transition-duration: 0.37s;
+	border: 1px solid #e8e7e9;
+	transition-duration: 0.37s;
+}
+.field-name-field-picture {
+	
+}
+.view-generations .item-list {
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+.view-generations .item-list h3,
+h2.block-title {
+	padding-right: 10px;	
+}
+.view-generations .item-list h3 {
+	text-align: right;
+	
+	border-bottom: 1px solid #ffffff;
+}
+.view-generations .item-list h3 a:hover {
+	text-decoration: none;
+}
+.view-generations .item-list>ul {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 100%;
+	background-color: white;
+	min-width: 250px;
+	max-height: 400px;
+	overflow: auto;
+	padding: 0;
+	margin: 0;
+	z-index: 6000;
+}
+.view-generations .item-list>ul li {
+	list-style: none;
+	
+}
+.view-generations .item-list>ul li:hover {
+	border-left: 10px solid #e9e8e7;
+}
+.view-generations .item-list>ul li:hover a {
+	text-decoration: none;	
+}
+.view-generations .item-list.visible>ul {
+	display: block;
+	box-shadow: 0px 4px 13px rgba(0,0,0,0.4);
+}
+.view-generations .item-list.visible>ul li {
+	padding: 5px 5px 5px 15px;
+	
+}
+.view-generations .item-list.visible {
+	
+}
+.view-generations .item-list.visible h3 {
+	border-bottom: 1px solid #e8e7e9;
+}
+.breadcrumb {
+	display: none;
+}
+.field-name-field-birthdate, .field-name-field-birthdate div,
+.field-name-field-deathdate, .field-name-field-deathdate div,
+.field-name-field-birthdate_approx, .field-name-field-birthdate_approx div,
+.field-name-field-deathdate_approx, .field-name-field-deathdate_approx div,
+.field-name-field-birthplace, .field-name-field-birthplace div,
+.field-name-field-deathplace, .field-name-field-deathplace div,
+.field-name-field-mother, .field-name-field-mother div,
+.field-name-field-father, .field-name-field-father div,
+.field-name-field-generation, .field-name-field-generation div,
+.field-name-field-gid, .field-name-field-gid div,
+.field-name-field-birth-order, .field-name-field-birth-order div {
+	display: inline;
+}
+.generational, .life, .parents {
+	font-size: 1.3em;
+	line-height: 1.5em;
+	font-weight: 200;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e8e7e9;
+}
+.field-name-body {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e8e7e9;
+}
+.block-views-generations-block h2.block-title {
+	
+}
+.views-field-field-uniontype {
+	text-transform: capitalize;
+}
+.well {
+	background: none;
+	border: none;
+	-webkit-border-radius: none;
+	-moz-border-radius: none;
+	border-radius: none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+span.genid {
+	font-size: 0.7em;
+	vertical-align: super;
+}
+.region-footer {
+	text-align: center;
+}
