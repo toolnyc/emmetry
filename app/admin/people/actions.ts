@@ -5,6 +5,7 @@ import { people } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { joinIsoParts } from "@/lib/dates";
 import { redirect } from "next/navigation";
+import { del } from "@vercel/blob";
 
 const VALID_GENERATIONS = [
   "Founders",
@@ -35,7 +36,8 @@ function extractFields(formData: FormData) {
   );
   const deathPlace = (formData.get("deathPlace") as string | null)?.trim() || null;
   const bio = (formData.get("bio") as string | null)?.trim() || null;
-  return { name, genealogicalId, generation, birthDate, birthPlace, deathDate, deathPlace, bio };
+  const photoUrl = (formData.get("photoUrl") as string | null)?.trim() || null;
+  return { name, genealogicalId, generation, birthDate, birthPlace, deathDate, deathPlace, bio, photoUrl };
 }
 
 function validate(fields: ReturnType<typeof extractFields>): string | null {
@@ -59,6 +61,15 @@ export async function updatePerson(
   const fields = extractFields(formData);
   const error = validate(fields);
   if (error) return { error };
+
+  const [existing] = await db.select({ photoUrl: people.photoUrl }).from(people).where(eq(people.id, id));
+  if (existing?.photoUrl && existing.photoUrl !== fields.photoUrl) {
+    try {
+      await del(existing.photoUrl);
+    } catch {
+      // non-fatal: continue even if blob deletion fails
+    }
+  }
 
   await db
     .update(people)

@@ -231,6 +231,13 @@ export default async function PersonPage({
       <div className="md:grid md:grid-cols-[3fr_2fr] md:gap-16">
         {/* Bio */}
         <div>
+          {person.photoUrl && (
+            <img
+              src={person.photoUrl}
+              alt={person.name ?? "Portrait"}
+              className="mb-8 max-w-[240px] w-full border border-rule"
+            />
+          )}
           {person.bio ? (
             <p
               className="font-sans text-ink"

@@ -58,6 +58,7 @@ export default async function EditPersonPage({
             deathDay: death.day,
             deathPlace: person.deathPlace,
             bio: person.bio,
+            photoUrl: person.photoUrl,
           }}
         />
       </div>

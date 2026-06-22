@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import { DateFields } from "./DateFields";
 
 const GENERATIONS = [
@@ -30,12 +31,35 @@ interface PersonFormProps {
     deathDay?: string;
     deathPlace?: string | null;
     bio?: string | null;
+    photoUrl?: string | null;
   };
   submitLabel?: string;
 }
 
 export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }: PersonFormProps) {
   const [state, formAction, pending] = useActionState(action, null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(defaultValues.photoUrl ?? null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const blob = await upload(file.name, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+      });
+      setPhotoUrl(blob.url);
+    } catch {
+      setUploadError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -200,9 +224,59 @@ export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }:
         />
       </div>
 
+      {/* Photo */}
+      <div>
+        <label
+          className="block font-mono uppercase text-ghost-strong mb-2"
+          style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+        >
+          Photo
+        </label>
+        {photoUrl && (
+          <div className="mb-3 flex items-start gap-4">
+            <img
+              src={photoUrl}
+              alt="Portrait"
+              className="max-w-[160px] border border-rule"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoUrl(null);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }}
+              className="font-mono uppercase text-union border border-union px-3 py-1 hover:bg-union hover:text-paper transition-colors"
+              style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleFileChange}
+          disabled={uploading}
+          className="block font-mono text-ghost-strong disabled:opacity-50"
+          style={{ fontSize: "var(--text-label)" }}
+        />
+        {uploading && (
+          <p className="mt-2 font-mono text-ghost-strong" style={{ fontSize: "var(--text-label)" }}>
+            Uploading…
+          </p>
+        )}
+        {uploadError && (
+          <p className="mt-2 font-mono text-union" style={{ fontSize: "var(--text-label)" }}>
+            {uploadError}
+          </p>
+        )}
+        <input type="hidden" name="photoUrl" value={photoUrl ?? ""} />
+      </div>
+
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || uploading}
         className="font-mono uppercase text-ink border border-ink px-6 py-2 hover:bg-ink hover:text-paper transition-colors disabled:opacity-50"
         style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
       >
