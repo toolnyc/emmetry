@@ -10,7 +10,7 @@ A rebuild of emmetry.org — a family genealogy and history site documenting six
 
 - **Frontend**: Next.js App Router (SSG for public pages, SSR for admin), deployed on Vercel
 - **Database**: Neon (serverless Postgres), via Drizzle ORM + `@neondatabase/serverless`
-- **Media**: Vercel Blob (images; audio is a future feature, not launch requirement)
+- **Media**: Vercel Blob (images)
 - **Auth**: Clerk (multi-admin, handles accounts and password resets)
 - **Admin**: Next.js SSR at `/admin/*`, custom-built (no CMS), Tiptap for bio rich text
 - **Search**: Client-side over a static JSON index, regenerated on each deploy
@@ -21,7 +21,7 @@ A rebuild of emmetry.org — a family genealogy and history site documenting six
 
 133 individuals across 7 generations (Founders through 6th). Domain vocabulary lives in `CONTEXT.md`; read it before naming anything. Core tables:
 
-- `people` — biographical records, photo_url, audio_url. `genealogical_id` and `generation` are nullable: a Descendant has both, a Married-in person has neither.
+- `people` — biographical records, photo_url. `genealogical_id` and `generation` are nullable: a Descendant has both, a Married-in person has neither.
 - `unions` — Unions (marriages), joining two people with date and place. At least one is a Descendant; cousin marriages mean both can be.
 - `parent_child` — Parentage links.
 - `sessions` — not stored; Clerk owns auth session management
@@ -70,7 +70,6 @@ The admin is a custom Next.js interface at `/admin/*`. No CMS. Core workflows:
 - Edits will be infrequent (a few times a year). Polish matters less than clarity.
 - Pete handles all initial content migration via script -- admin is for ongoing maintenance only.
 - Site must be live at emmetry.org. DNS currently on DreamHost -- confirm transfer or delegation to Vercel.
-- Audio (voice notes) is a future feature, not launch requirement.
 
 ---
 

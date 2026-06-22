@@ -9,4 +9,4 @@ Live Postgres queries via a Next.js API route were considered. Rejected because 
 ## Consequences
 
 - If the dataset grows significantly beyond its current size or search requirements become complex (faceted filters, fuzzy ranking), this decision should be revisited.
-- Audio transcripts, if added later, should be included in the index as a text field on the person record.
+
