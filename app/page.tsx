@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { db } from "@/db";
 import { people } from "@/db/schema";
 import { isNotNull } from "drizzle-orm";
@@ -94,12 +95,13 @@ export default async function HomePage() {
                 {members.map((person) => (
                   <li key={person.id} className="flex items-baseline gap-6">
                     {/* Name */}
-                    <span
+                    <Link
+                      href={`/people/${person.id}`}
                       className="font-sans text-ink"
                       style={{ fontSize: "var(--text-name)" }}
                     >
                       {person.name ?? "UNKNOWN"}
-                    </span>
+                    </Link>
 
                     {/* Life dates */}
                     {(person.birthDate || person.deathDate) && (
