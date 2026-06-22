@@ -1,0 +1,116 @@
+/*
+ * Emmetry design tokens — source of truth.
+ *
+ * Tailwind v4 CSS-first config. Tokens declared in @theme generate the
+ * corresponding utilities (e.g. --color-ink -> bg-ink / text-ink).
+ * The human-readable rationale lives in /DESIGN.md and docs/adr/0005-*.
+ *
+ * Two knobs are deliberately easy to tune on review:
+ *   - paper warmth: --color-paper (stark white vs. warm archival)
+ *   - union red:    --color-union
+ */
+
+@import "tailwindcss";
+
+@theme {
+  /* ---- Color: near-monochrome, grey encodes distance-from-focus ---- */
+  --color-paper: #ffffff;        /* background. warm alt: #faf8f4 */
+  --color-ink: #1a1a1a;          /* real content (names, bio) */
+
+  /* Ghost ladder: oversized wayfinding headers, palest = furthest from focus */
+  --color-ghost-strong: #9b9b9b; /* the open / nearest section header */
+  --color-ghost-mid: #c7c7c7;
+  --color-ghost-faint: #e6e6e6;  /* collapsed / distant section header */
+
+  --color-rule: #e0e0e0;         /* hairline rules and dividers */
+
+  /* Red is reserved for the Union marker. Never a generic accent. */
+  --color-union: #c8102e;
+
+  /* Dark footer surface */
+  --color-footer: #2b2b2b;
+  --color-on-footer: #ffffff;
+
+  /* ---- Type families (self-hosted via next/font on scaffold) ---- */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ---- Type roles ----
+   * Display headers are fluid (clamp); small type is fixed for legibility.
+   */
+  --text-display: clamp(2.5rem, 8vw, 6rem);
+  --text-display--line-height: 0.95;
+
+  --text-wordmark: clamp(1.5rem, 2.5vw, 2rem);
+  --text-wordmark--line-height: 1;
+
+  --text-name: clamp(1.5rem, 3.5vw, 2.25rem);
+  --text-name--line-height: 1.1;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+
+  --text-label: 0.8125rem;       /* mono field labels */
+  --text-label--line-height: 1.4;
+
+  --text-nav: 0.75rem;           /* mono, uppercase, tracked */
+  --text-nav--line-height: 1;
+
+  --text-tagline: 0.625rem;      /* AN EMMET FAMILY RECORD */
+  --text-tagline--line-height: 1.2;
+
+  --text-date: 0.625rem;         /* tiny stacked birth/death */
+  --text-date--line-height: 1.1;
+
+  /* ---- Weights ---- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-heavy: 800;      /* wordmark */
+
+  /* ---- Tracking ---- */
+  --tracking-wordmark: -0.02em;
+  --tracking-nav: 0.08em;
+  --tracking-tagline: 0.12em;
+
+  /* ---- Spacing (0.25rem base) ---- */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-24: 6rem;
+
+  /* ---- Geometry: sharp and rectilinear; only dots/search are round ---- */
+  --radius-none: 0;
+  --radius-full: 9999px;
+
+  /* ---- Motion: restrained, archival. Gate with prefers-reduced-motion. ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+
+  /* ---- Breakpoints ---- */
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1100px;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
