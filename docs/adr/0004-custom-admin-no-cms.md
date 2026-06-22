@@ -1,0 +1,3 @@
+# Admin is custom-built; no CMS
+
+The admin editing workflows are too domain-specific for a generic CMS to handle without significant bending. The person form must show grandparents and grandchildren as read-only Lineage context while keeping direct parents, children, and Unions editable -- a distinction no CMS understands. The Stub concept (a person record with null name, representing a known-but-unentered person) is also domain-specific. Payload CMS was the closest candidate but would fight the data model on every relationship field. A custom Next.js admin is roughly 4-5 pages of server actions and forms, giving full control over these domain rules without fighting an abstraction layer.

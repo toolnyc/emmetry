@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# local reference material
+ref/
+
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+dist/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel

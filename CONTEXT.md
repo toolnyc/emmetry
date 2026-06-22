@@ -41,3 +41,7 @@ _Avoid_: spouse, in-law, non-member
 **Root**:
 The single head of the descent (Thomas Addis Emmet) — the one Descendant with a Genealogical ID but no Parentage. Identified by inference, not a stored flag.
 _Avoid_: origin, ancestor zero, patriarch
+
+**Stub**:
+A person record with no name -- a placeholder for someone known to exist but not yet entered. Parentage and Union links to a Stub are real and intact; the Stub is filled in later without re-wiring anything. Displayed as "UNKNOWN" in the admin and on the site.
+_Avoid_: placeholder, incomplete record, TBD
