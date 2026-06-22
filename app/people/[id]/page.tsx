@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/db";
 import { people, parentChild, unions } from "@/db/schema";
 import type { Person } from "@/db/schema";
+import { formatIsoDate } from "@/lib/dates";
 
 export const dynamicParams = false;
 
@@ -101,7 +102,7 @@ function LineageSection({ title, members }: { title: string; members: Person[] }
                   className="font-mono text-ghost-strong flex-shrink-0"
                   style={{ fontSize: "var(--text-date)" }}
                 >
-                  {[p.birthDate, p.deathDate].filter(Boolean).join(" – ")}
+                  {[formatIsoDate(p.birthDate), formatIsoDate(p.deathDate)].filter(Boolean).join(" – ")}
                 </span>
               )}
             </li>
@@ -154,7 +155,7 @@ function UnionsSection({
                     className="font-mono text-ghost-strong"
                     style={{ fontSize: "var(--text-date)" }}
                   >
-                    {date}
+                    {formatIsoDate(date)}
                   </div>
                 )}
               </div>
@@ -220,8 +221,8 @@ export default async function PersonPage({
               lineHeight: "var(--text-date--line-height)",
             }}
           >
-            {person.birthDate && <span>{person.birthDate}</span>}
-            {person.deathDate && <span>{person.deathDate}</span>}
+            {person.birthDate && <span>{formatIsoDate(person.birthDate)}</span>}
+            {person.deathDate && <span>{formatIsoDate(person.deathDate)}</span>}
           </span>
         )}
       </div>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { SiteFooter } from "./components/SiteFooter";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,10 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${ibmPlexMono.variable}`}>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${inter.variable} ${ibmPlexMono.variable} pb-12`}>
+          {children}
+          <SiteFooter />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/db";
 import { people } from "@/db/schema";
 import { isNotNull } from "drizzle-orm";
+import { formatIsoDate } from "@/lib/dates";
 
 const GENERATION_ORDER = [
   "Founders",
@@ -113,10 +114,10 @@ export default async function HomePage() {
                         }}
                       >
                         {person.birthDate && (
-                          <span>{person.birthDate}</span>
+                          <span>{formatIsoDate(person.birthDate)}</span>
                         )}
                         {person.deathDate && (
-                          <span>{person.deathDate}</span>
+                          <span>{formatIsoDate(person.deathDate)}</span>
                         )}
                       </span>
                     )}

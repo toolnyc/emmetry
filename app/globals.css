@@ -12,6 +12,11 @@
 
 @import "tailwindcss";
 
+/* Explicit source scanning -- auto-detection misses files created after dev server start */
+@source "./**/*.{tsx,ts,jsx,js}";
+@source "../lib/**/*.{ts,tsx}";
+@source "../middleware.ts";
+
 @theme {
   /* ---- Color: near-monochrome, grey encodes distance-from-focus ---- */
   --color-paper: #ffffff;        /* background. warm alt: #faf8f4 */

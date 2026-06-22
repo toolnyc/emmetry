@@ -7,6 +7,7 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { people, unions, parentChild } from "../db/schema";
 import type { Person } from "../db/schema";
+import { parseLegacyDate } from "../lib/dates";
 
 const sql = neon(process.env.NEON_CONN_STRING!);
 const db = drizzle(sql, { schema: { people, unions, parentChild } });
@@ -38,7 +39,8 @@ function splitOnFirstTopLevelComma(str: string): [string, string] {
 function parseUnionLine(raw: string): { nameA: string; nameB: string; date: string | null } {
   // Strip trailing date " (DayName, Month DD, YYYY)" -- date always has a 4-digit year
   const dateMatch = raw.match(/\s+\(([^)]*\d{4}[^)]*)\)\s*$/);
-  const date = dateMatch ? dateMatch[1].trim() : null;
+  const rawDate = dateMatch ? dateMatch[1].trim() : null;
+  const date = rawDate ? (parseLegacyDate(rawDate) ?? rawDate) : null;
   const withoutDate = dateMatch ? raw.slice(0, dateMatch.index).trim() : raw.trim();
   const [nameA, nameB] = splitOnFirstTopLevelComma(withoutDate);
   return { nameA, nameB, date };
@@ -151,7 +153,7 @@ function parseCatalog(catalogPath: string) {
       const match = raw.match(/^(.*?\d{4}),?\s*(.*)$/);
       if (!match) return { date: raw, place: null };
       return {
-        date: match[1].trim() || null,
+        date: parseLegacyDate(match[1].trim()) ?? (match[1].trim() || null),
         place: match[2].trim() || null,
       };
     };
