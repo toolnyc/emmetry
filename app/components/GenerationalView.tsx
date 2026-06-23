@@ -1,0 +1,182 @@
+"use client";
+
+import { useState } from "react";
+import { PersonLink } from "./PersonLink";
+import { LifeDates } from "./LifeDates";
+import { UnionMarker } from "./UnionMarker";
+import { Collapse } from "./Collapse";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+
+export type PersonLite = {
+  id: string;
+  name: string | null;
+  birthDate: string | null;
+  deathDate: string | null;
+  photoUrl: string | null;
+};
+
+export type CoupleUnit = {
+  descendant: PersonLite;
+  partner: PersonLite | null;
+  children: PersonLite[];
+};
+
+export type GenerationGroup = {
+  generation: string;
+  year: number | null;
+  couples: CoupleUnit[];
+};
+
+function headerTone(index: number, open: number): string {
+  if (index === open) return "text-ghost-strong";
+  if (Math.abs(index - open) === 1) return "text-ghost-mid";
+  return "text-ghost-faint";
+}
+
+function yearTone(index: number, open: number): string {
+  if (index === open) return "text-ghost-mid";
+  return "text-ghost-faint";
+}
+
+function NameDates({ p, sub = false }: { p: PersonLite; sub?: boolean }) {
+  const size = sub ? "var(--text-name-sub)" : "var(--text-name)";
+  return (
+    <span className="inline-flex items-center gap-2 md:gap-3">
+      <PersonLink
+        id={p.id}
+        name={p.name}
+        photoUrl={p.photoUrl}
+        className="font-sans text-ink"
+        style={{ fontSize: size, letterSpacing: "var(--tracking-name)" }}
+      />
+      <LifeDates
+        birthDate={p.birthDate}
+        deathDate={p.deathDate}
+        sizeVar={size}
+      />
+    </span>
+  );
+}
+
+function Couple({ couple }: { couple: CoupleUnit }) {
+  const { descendant, partner, children } = couple;
+  return (
+    <div data-anim>
+      {/* Mobile: couple hangs off the continuous descent spine; the Union dot
+          sits on the rail itself. */}
+      <div className="flex flex-col gap-3 md:hidden">
+        <NameDates p={descendant} />
+        {partner && (
+          <div className="relative flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className="absolute -left-6 h-2 w-2 -translate-x-1/2 rounded-full bg-union"
+            />
+            <span
+              className="font-mono uppercase text-ghost-strong"
+              style={{
+                fontSize: "var(--text-tagline)",
+                letterSpacing: "var(--tracking-nav)",
+              }}
+            >
+              Union
+            </span>
+          </div>
+        )}
+        {partner && <NameDates p={partner} />}
+      </div>
+
+      {/* Desktop: couple on one non-wrapping line; children filed beneath in a
+          horizontal scroll rail. */}
+      <div className="hidden md:block">
+        <div className="flex items-center gap-6">
+          <NameDates p={descendant} />
+          {partner && <UnionMarker orientation="horizontal" />}
+          {partner && <NameDates p={partner} />}
+        </div>
+        {children.length > 0 && (
+          <div className="mt-2 ml-6 border-l border-rule pl-4">
+            <OverlayScrollbarsComponent
+              element="div"
+              defer
+              options={{
+                scrollbars: {
+                  theme: "os-theme-emmetry",
+                  autoHide: "scroll",
+                  autoHideDelay: 600,
+                },
+                overflow: { x: "scroll", y: "hidden" },
+              }}
+            >
+              <div className="flex gap-6 pb-3">
+                {children.map((c) => (
+                  <div key={c.id} className="flex-shrink-0">
+                    <NameDates p={c} sub />
+                  </div>
+                ))}
+              </div>
+            </OverlayScrollbarsComponent>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function GenerationalView({ groups }: { groups: GenerationGroup[] }) {
+  const [open, setOpen] = useState(0);
+
+  return (
+    <div className="space-y-6">
+      {groups.map((group, i) => {
+        const isOpen = i === open;
+        return (
+          <section key={group.generation}>
+            <button
+              type="button"
+              onClick={() => setOpen(isOpen ? -1 : i)}
+              aria-expanded={isOpen}
+              className="group block w-full cursor-pointer text-left"
+            >
+              <h2
+                className={`flex items-center gap-4 font-sans font-[400] leading-[0.95] transition-colors duration-200 group-hover:text-ghost-strong ${headerTone(
+                  i,
+                  open
+                )}`}
+                style={{
+                  fontSize: "var(--text-display)",
+                  letterSpacing: "var(--tracking-display)",
+                  transitionTimingFunction: "var(--ease-standard)",
+                }}
+              >
+                <span>{group.generation}</span>
+                {group.year != null && (
+                  <span
+                    className={`font-mono ${yearTone(i, open)}`}
+                    style={{ fontSize: "0.5em", letterSpacing: "normal" }}
+                  >
+                    {group.year}
+                  </span>
+                )}
+              </h2>
+            </button>
+
+            <Collapse open={isOpen}>
+              {group.couples.length > 0 && (
+                <div className="mt-6">
+                  <div className="mb-6 border-t border-rule" />
+                  <div className="space-y-3 border-l border-ink/30 pl-6 md:space-y-4 md:border-l-0 md:pl-0">
+                    {group.couples.map((couple) => (
+                      <Couple key={couple.descendant.id} couple={couple} />
+                    ))}
+                  </div>
+                  <div className="mt-6 hidden border-b border-rule md:block" />
+                </div>
+              )}
+            </Collapse>
+          </section>
+        );
+      })}
+    </div>
+  );
+}

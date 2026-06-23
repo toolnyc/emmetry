@@ -3,12 +3,26 @@ import { db } from "@/db";
 import { people, parentChild, unions } from "@/db/schema";
 import type { Person } from "@/db/schema";
 import { formatIsoDate } from "@/lib/dates";
+import { displayName } from "@/lib/names";
+import { LineageColumn } from "@/app/components/LineageColumn";
+import { BackButton } from "@/app/components/BackButton";
+import type { PersonLite } from "@/app/components/GenerationalView";
 
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const rows = await db.select({ id: people.id }).from(people);
   return rows.map((r) => ({ id: r.id }));
+}
+
+function toLite(p: Person): PersonLite {
+  return {
+    id: p.id,
+    name: p.name,
+    birthDate: p.birthDate,
+    deathDate: p.deathDate,
+    photoUrl: p.photoUrl,
+  };
 }
 
 async function loadGraph() {
@@ -24,7 +38,12 @@ function computeNeighborhood(
   id: string,
   allPeople: Person[],
   allLinks: { parentId: string; childId: string }[],
-  allUnions: { personAId: string; personBId: string; date: string | null; place: string | null }[]
+  allUnions: {
+    personAId: string;
+    personBId: string;
+    date: string | null;
+    place: string | null;
+  }[]
 ) {
   const byId = new Map(allPeople.map((p) => [p.id, p]));
 
@@ -33,28 +52,22 @@ function computeNeighborhood(
   for (const link of allLinks) {
     if (!parentsByChild.has(link.childId)) parentsByChild.set(link.childId, []);
     parentsByChild.get(link.childId)!.push(link.parentId);
-    if (!childrenByParent.has(link.parentId)) childrenByParent.set(link.parentId, []);
+    if (!childrenByParent.has(link.parentId))
+      childrenByParent.set(link.parentId, []);
     childrenByParent.get(link.parentId)!.push(link.childId);
   }
 
   const resolve = (ids: string[]) =>
     ids.map((i) => byId.get(i)).filter((p): p is Person => p !== undefined);
 
-  const parentIds = parentsByChild.get(id) ?? [];
-  const parents = resolve(parentIds);
-
-  const grandparentIds = [
+  const parents = resolve(parentsByChild.get(id) ?? []);
+  const grandparents = resolve([
     ...new Set(parents.flatMap((p) => parentsByChild.get(p.id) ?? [])),
-  ];
-  const grandparents = resolve(grandparentIds);
-
-  const childIds = childrenByParent.get(id) ?? [];
-  const children = resolve(childIds);
-
-  const grandchildIds = [
+  ]);
+  const children = resolve(childrenByParent.get(id) ?? []);
+  const grandchildren = resolve([
     ...new Set(children.flatMap((c) => childrenByParent.get(c.id) ?? [])),
-  ];
-  const grandchildren = resolve(grandchildIds);
+  ]);
 
   const personUnions = allUnions
     .filter((u) => u.personAId === id || u.personBId === id)
@@ -64,105 +77,40 @@ function computeNeighborhood(
       if (!partner) return null;
       return { partner, date: u.date, place: u.place };
     })
-    .filter((u): u is { partner: Person; date: string | null; place: string | null } => u !== null);
+    .filter(
+      (u): u is { partner: Person; date: string | null; place: string | null } =>
+        u !== null
+    );
 
   return { parents, grandparents, personUnions, children, grandchildren };
 }
 
-function LineageSection({ title, members }: { title: string; members: Person[] }) {
-  return (
-    <div>
-      <h3
-        className="font-mono uppercase text-ghost-strong mb-3"
-        style={{
-          fontSize: "var(--text-label)",
-          letterSpacing: "var(--tracking-nav)",
-        }}
-      >
-        {title}
-      </h3>
-      <div className="border-t border-rule mb-3" />
-      {members.length === 0 ? (
-        <span className="font-mono text-ghost-mid" style={{ fontSize: "var(--text-label)" }}>
-          —
-        </span>
-      ) : (
-        <ul className="space-y-2">
-          {members.map((p) => (
-            <li key={p.id} className="flex items-baseline gap-3">
-              <Link
-                href={`/people/${p.id}`}
-                className="font-sans text-ink"
-                style={{ fontSize: "var(--text-body)" }}
-              >
-                {p.name ?? "UNKNOWN"}
-              </Link>
-              {(p.birthDate || p.deathDate) && (
-                <span
-                  className="font-mono text-ghost-strong flex-shrink-0"
-                  style={{ fontSize: "var(--text-date)" }}
-                >
-                  {[formatIsoDate(p.birthDate), formatIsoDate(p.deathDate)].filter(Boolean).join(" – ")}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function UnionsSection({
-  personUnions,
+function FieldRow({
+  label,
+  value,
+  marker,
 }: {
-  personUnions: { partner: Person; date: string | null; place: string | null }[];
+  label: string;
+  value: React.ReactNode;
+  marker?: boolean;
 }) {
   return (
-    <div>
-      <h3
-        className="font-mono uppercase text-ghost-strong mb-3"
-        style={{
-          fontSize: "var(--text-label)",
-          letterSpacing: "var(--tracking-nav)",
-        }}
+    <div className="flex items-baseline justify-between gap-6 border-b border-rule py-2">
+      <span
+        className="font-sans text-ink"
+        style={{ fontSize: "var(--text-body)" }}
       >
-        Unions
-      </h3>
-      <div className="border-t border-rule mb-3" />
-      {personUnions.length === 0 ? (
-        <span className="font-mono text-ghost-mid" style={{ fontSize: "var(--text-label)" }}>
-          —
-        </span>
-      ) : (
-        <ul className="space-y-3">
-          {personUnions.map(({ partner, date }, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <span
-                className="mt-[0.4em] w-1.5 h-1.5 rounded-full bg-union flex-shrink-0"
-                aria-hidden="true"
-              />
-              <div>
-                <Link
-                  href={`/people/${partner.id}`}
-                  className="font-sans text-ink"
-                  style={{ fontSize: "var(--text-body)" }}
-                >
-                  {partner.name ?? "UNKNOWN"}
-                </Link>
-                {date && (
-                  <div
-                    className="font-mono text-ghost-strong"
-                    style={{ fontSize: "var(--text-date)" }}
-                  >
-                    {formatIsoDate(date)}
-                  </div>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+        {label}
+      </span>
+      <span className="flex items-center gap-2 text-right">
+        {marker && (
+          <span
+            className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-union"
+            aria-hidden="true"
+          />
+        )}
+        {value}
+      </span>
     </div>
   );
 }
@@ -176,68 +124,95 @@ export default async function PersonPage({
   const { allPeople, allLinks, allUnions } = await loadGraph();
 
   const person = allPeople.find((p) => p.id === id);
-  if (!person) return <div>Person not found.</div>;
+  if (!person) return <div className="px-8 py-12">Person not found.</div>;
 
   const { parents, grandparents, personUnions, children, grandchildren } =
     computeNeighborhood(id, allPeople, allLinks, allUnions);
 
+  const birth = [formatIsoDate(person.birthDate), person.birthPlace]
+    .filter(Boolean)
+    .join(", ");
+  const death = [formatIsoDate(person.deathDate), person.deathPlace]
+    .filter(Boolean)
+    .join(", ");
+
+  const monoValue = "font-mono uppercase text-ink";
+  const monoStyle = { fontSize: "var(--text-label)" } as React.CSSProperties;
+
   return (
-    <main className="min-h-screen bg-paper px-8 py-16 md:px-16">
-      {/* Back link */}
-      <Link
-        href="/"
-        className="font-mono uppercase text-ghost-strong block mb-12"
+    <main className="min-h-screen bg-paper px-8 py-12 md:px-16">
+      {/* Ghosted name */}
+      <h1
+        className="font-sans font-[400] leading-[0.95] text-ghost-strong"
         style={{
-          fontSize: "var(--text-nav)",
-          letterSpacing: "var(--tracking-nav)",
+          fontSize: "var(--text-display)",
+          letterSpacing: "var(--tracking-display)",
         }}
       >
-        ← All Generations
-      </Link>
-
-      {/* Ghost generation header */}
-      <h1
-        className="font-sans font-[400] text-ghost-strong leading-[0.95] mb-6"
-        style={{ fontSize: "var(--text-display)" }}
-      >
-        {person.generation ?? "Married-in"}
+        {displayName(person.name)}
       </h1>
 
-      <div className="border-t border-rule mb-8" />
-
-      {/* Name + life dates */}
-      <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 mb-12">
-        <span
-          className="font-sans text-ink"
-          style={{ fontSize: "var(--text-name)" }}
-        >
-          {person.name ?? "UNKNOWN"}
-        </span>
-        {(person.birthDate || person.deathDate) && (
-          <span
-            className="font-mono text-ghost-strong flex flex-col"
-            style={{
-              fontSize: "var(--text-date)",
-              lineHeight: "var(--text-date--line-height)",
-            }}
-          >
-            {person.birthDate && <span>{formatIsoDate(person.birthDate)}</span>}
-            {person.deathDate && <span>{formatIsoDate(person.deathDate)}</span>}
-          </span>
-        )}
-      </div>
-
-      {/* Two-column: bio left, lineage right */}
-      <div className="md:grid md:grid-cols-[3fr_2fr] md:gap-16">
-        {/* Bio */}
-        <div>
+      <div className="mt-10 md:grid md:grid-cols-[3fr_2fr] md:gap-12">
+        {/* Left: portrait, fields, bio, navigation */}
+        <div className="md:border-r md:border-rule md:pr-12">
           {person.photoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={person.photoUrl}
               alt={person.name ?? "Portrait"}
-              className="mb-8 max-w-[240px] w-full border border-rule"
+              className="mb-8 w-full max-w-[240px] border border-rule"
             />
           )}
+
+          <dl className="mb-10">
+            {birth && (
+              <FieldRow
+                label="Birth"
+                value={
+                  <span className={monoValue} style={monoStyle}>
+                    {birth}
+                  </span>
+                }
+              />
+            )}
+            {death && (
+              <FieldRow
+                label="Death"
+                value={
+                  <span className={monoValue} style={monoStyle}>
+                    {death}
+                  </span>
+                }
+              />
+            )}
+            {personUnions.map((u, i) => (
+              <FieldRow
+                key={i}
+                label="Union"
+                marker
+                value={
+                  <span className="flex flex-col items-end">
+                    <Link
+                      href={`/people/${u.partner.id}`}
+                      className="font-mono uppercase text-ink"
+                      style={monoStyle}
+                    >
+                      {displayName(u.partner.name)}
+                    </Link>
+                    {(u.date || u.place) && (
+                      <span
+                        className="font-mono uppercase text-ghost-strong"
+                        style={{ fontSize: "var(--text-date)" }}
+                      >
+                        {[formatIsoDate(u.date), u.place].filter(Boolean).join(", ")}
+                      </span>
+                    )}
+                  </span>
+                }
+              />
+            ))}
+          </dl>
+
           {person.bio ? (
             <p
               className="font-sans text-ink"
@@ -256,15 +231,33 @@ export default async function PersonPage({
               No biography recorded.
             </p>
           )}
+
+          <div className="mt-12 flex items-baseline gap-8">
+            <BackButton />
+            <Link
+              href="/"
+              className="font-sans font-[400] leading-none text-ghost-mid transition-colors duration-200 hover:text-ghost-strong"
+              style={{
+                fontSize: "var(--text-name)",
+                letterSpacing: "var(--tracking-name)",
+                transitionTimingFunction: "var(--ease-standard)",
+              }}
+            >
+              Home
+            </Link>
+          </div>
         </div>
 
-        {/* Lineage neighborhood */}
-        <div className="mt-12 md:mt-0 space-y-8">
-          <LineageSection title="Grandparents" members={grandparents} />
-          <LineageSection title="Parents" members={parents} />
-          <UnionsSection personUnions={personUnions} />
-          <LineageSection title="Children" members={children} />
-          <LineageSection title="Grandchildren" members={grandchildren} />
+        {/* Right: relationship accordion */}
+        <div className="mt-12 md:mt-0">
+          <LineageColumn
+            sections={[
+              { title: "Grandparents", members: grandparents.map(toLite) },
+              { title: "Parents", members: parents.map(toLite) },
+              { title: "Children", members: children.map(toLite) },
+              { title: "Grandchildren", members: grandchildren.map(toLite) },
+            ]}
+          />
         </div>
       </div>
     </main>
