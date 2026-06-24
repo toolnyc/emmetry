@@ -6,9 +6,17 @@ import gsap from "gsap";
 import { EASE, DURATION } from "@/lib/gsap-presets";
 
 /**
- * Logo: a single "E" that expands on hover to reveal "mmetry" and the
- * tagline. The suffix is revealed via a clip-path wipe; the tagline fades in.
- * Collapses back on mouse-leave. Honors prefers-reduced-motion.
+ * Logo: a single "E" that expands on hover to reveal "mmetry" and the tagline.
+ *
+ * Layout approach:
+ *  - The suffix span uses overflow:hidden + width:0 so it is *removed from
+ *    layout* when hidden — the cell shrinks to just the "E".  GSAP animates
+ *    width to "auto" on hover, which naturally widens the header cell.
+ *  - The tagline is position:absolute so it never contributes to the cell
+ *    height; the "E" therefore stays vertically centred in its container at
+ *    all times.
+ *  - A small paddingRight on the suffix prevents subpixel clipping of the
+ *    last glyph.
  */
 export function Wordmark() {
   const suffixRef = useRef<HTMLSpanElement>(null);
@@ -17,7 +25,7 @@ export function Wordmark() {
 
   useLayoutEffect(() => {
     if (suffixRef.current)
-      gsap.set(suffixRef.current, { clipPath: "inset(0 100% 0 0)" });
+      gsap.set(suffixRef.current, { width: 0, overflow: "hidden" });
     if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0 });
   }, []);
 
@@ -31,7 +39,7 @@ export function Wordmark() {
     tlRef.current = gsap
       .timeline()
       .to(suffixRef.current, {
-        clipPath: "inset(0 0% 0 0)",
+        width: "auto",
         duration: r ? 0.01 : DURATION.slow,
         ease: EASE.out,
       })
@@ -55,7 +63,7 @@ export function Wordmark() {
       .to(
         suffixRef.current,
         {
-          clipPath: "inset(0 100% 0 0)",
+          width: 0,
           duration: r ? 0.01 : DURATION.base,
           ease: EASE.in,
         },
@@ -66,12 +74,13 @@ export function Wordmark() {
   return (
     <Link
       href="/"
-      className="block"
+      className="relative block"
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
+      {/* Name line — determines the cell height */}
       <span
-        className="block font-sans font-[400] text-ink leading-none"
+        className="flex items-baseline font-sans font-[400] text-ink leading-none"
         style={{
           fontSize: "var(--text-wordmark)",
           letterSpacing: "var(--tracking-display)",
@@ -80,16 +89,19 @@ export function Wordmark() {
         E
         <span
           ref={suffixRef}
-          className="inline-block"
-          style={{ clipPath: "inset(0 100% 0 0)" }}
+          className="inline-block whitespace-nowrap"
+          style={{ width: 0, overflow: "hidden", paddingRight: "0.06em" }}
         >
           mmetry
         </span>
       </span>
+
+      {/* Tagline — absolutely positioned so it never shifts the E up */}
       <span
         ref={taglineRef}
-        className="block font-mono uppercase text-ink mt-1"
+        className="absolute left-0 font-mono uppercase text-ink whitespace-nowrap"
         style={{
+          top: "calc(100% + 0.3em)",
           fontSize: "var(--text-tagline)",
           letterSpacing: "var(--tracking-tagline)",
           opacity: 0,

@@ -156,15 +156,12 @@
   --os-handle-interactive-area-offset: 6px;
 }
 
-/* The rail: a 1px grey hairline centred in the track, drawn via ::before so
-   the handle element stacks on top of it without any z-index tricks. */
-.os-scrollbar.os-theme-emmetry .os-scrollbar-track {
-  position: relative;
-}
-.os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-track::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+/* The rail: a 1px grey hairline centred in the track via background gradient.
+   The library already uses ::before on the track for hit-area extension, so
+   the rail must live in the background layer, not a pseudo-element.
+   The handle is then centred over the rail by overriding its default flush-edge
+   positioning (right:0 / bottom:0) with an explicit 50% centre + translate. */
+.os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-track {
   background: linear-gradient(
     to right,
     transparent calc(50% - 0.5px),
@@ -173,10 +170,7 @@
     transparent calc(50% + 0.5px)
   );
 }
-.os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-track::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+.os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-track {
   background: linear-gradient(
     to bottom,
     transparent calc(50% - 0.5px),
@@ -184,6 +178,29 @@
     var(--color-rule) calc(50% + 0.5px),
     transparent calc(50% + 0.5px)
   );
+}
+
+/* Centre the handle over the rail (library default is flush right / bottom). */
+.os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-handle {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(calc(var(--os-scroll-percent-directional) * -100%));
+}
+.os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-handle {
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) translateX(calc(var(--os-scroll-percent-directional) * -100%));
+}
+/* Container-query variant: library switches to cq units for the scroll offset. */
+@supports (container-type: size) {
+  .os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-handle {
+    top: 0;
+    transform: translateX(-50%) translateY(calc(var(--os-scroll-percent-directional) * 100cqh + var(--os-scroll-percent-directional) * -100%));
+  }
+  .os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-handle {
+    left: 0;
+    transform: translateY(-50%) translateX(calc(var(--os-scroll-percent-directional) * 100cqw + var(--os-scroll-percent-directional) * -100%));
+  }
 }
 
 /* Loading bar: a thin horizontal track + ghost-strong fill, echoing the
