@@ -194,6 +194,7 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
             map.getCanvas().style.cursor = "";
           });
 
+          map.resize();
           setMapReady(true);
           mapRef.current = map;
 
@@ -227,7 +228,7 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
 
   if (!maptilerKey || mapError) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-paper">
+      <div className="absolute inset-0 flex items-center justify-center bg-paper">
         <p
           className="font-mono uppercase text-ghost-strong"
           style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
@@ -239,7 +240,7 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div className="absolute inset-0">
       {/* Map canvas */}
       <div ref={containerRef} className="absolute inset-0" />
 
