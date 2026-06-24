@@ -228,7 +228,7 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
 
   if (!maptilerKey || mapError) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-paper">
+      <div style={{ position: "fixed", inset: 0 }} className="flex items-center justify-center bg-paper">
         <p
           className="font-mono uppercase text-ghost-strong"
           style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
@@ -240,9 +240,9 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
   }
 
   return (
-    <div className="absolute inset-0">
+    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100dvh" }}>
       {/* Map canvas */}
-      <div ref={containerRef} className="absolute inset-0" />
+      <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
 
       {/* Floating mode nav + home */}
       <div

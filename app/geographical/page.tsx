@@ -90,12 +90,10 @@ export default async function GeographicalPage({
   const pins = await loadPins();
 
   return (
-    <div className="fixed inset-0">
-      <MapView
-        pins={pins}
-        initialPlaceId={selectedPlaceId ?? null}
-        maptilerKey={process.env.NEXT_PUBLIC_MAPTILER_KEY ?? ""}
-      />
-    </div>
+    <MapView
+      pins={pins}
+      initialPlaceId={selectedPlaceId ?? null}
+      maptilerKey={process.env.NEXT_PUBLIC_MAPTILER_KEY ?? ""}
+    />
   );
 }
