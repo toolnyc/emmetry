@@ -22,6 +22,7 @@ function toLite(p: Person): PersonLite {
   return {
     id: p.id,
     name: p.name,
+    preferredName: p.preferredName,
     birthDate: p.birthDate,
     deathDate: p.deathDate,
     photoUrl: p.photoUrl,

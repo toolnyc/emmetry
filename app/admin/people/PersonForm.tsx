@@ -20,6 +20,7 @@ interface PersonFormProps {
   action: (prev: ActionResult, formData: FormData) => Promise<ActionResult>;
   defaultValues?: {
     name?: string | null;
+    preferredName?: string | null;
     genealogicalId?: string | null;
     generation?: string | null;
     birthYear?: string;
@@ -95,6 +96,26 @@ export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }:
           name="name"
           defaultValue={defaultValues.name ?? ""}
           placeholder="Leave blank to save as UNKNOWN"
+          className="w-full border border-rule bg-paper font-sans text-ink px-4 py-2 outline-none focus:border-ink"
+          style={{ fontSize: "var(--text-body)" }}
+        />
+      </div>
+
+      {/* Preferred name */}
+      <div>
+        <label
+          htmlFor="preferredName"
+          className="block font-mono uppercase text-ghost-strong mb-2"
+          style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+        >
+          Preferred name
+        </label>
+        <input
+          id="preferredName"
+          type="text"
+          name="preferredName"
+          defaultValue={defaultValues.preferredName ?? ""}
+          placeholder="e.g. Jeannette Erin Emmet — shown on list pages"
           className="w-full border border-rule bg-paper font-sans text-ink px-4 py-2 outline-none focus:border-ink"
           style={{ fontSize: "var(--text-body)" }}
         />

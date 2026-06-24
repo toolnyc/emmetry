@@ -9,6 +9,7 @@ export const people = pgTable("people", {
   birthPlace: text("birth_place"),
   deathDate: text("death_date"),
   deathPlace: text("death_place"),
+  preferredName: text("preferred_name"),
   bio: text("bio"),
   photoUrl: text("photo_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

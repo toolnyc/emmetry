@@ -21,6 +21,7 @@ type ActionResult = { error: string } | { success: true };
 
 function extractFields(formData: FormData) {
   const name = (formData.get("name") as string | null)?.trim() || null;
+  const preferredName = (formData.get("preferredName") as string | null)?.trim() || null;
   const genealogicalId = (formData.get("genealogicalId") as string | null)?.trim() || null;
   const generation = (formData.get("generation") as string | null)?.trim() || null;
   const birthDate = joinIsoParts(
@@ -37,7 +38,7 @@ function extractFields(formData: FormData) {
   const deathPlace = (formData.get("deathPlace") as string | null)?.trim() || null;
   const bio = (formData.get("bio") as string | null)?.trim() || null;
   const photoUrl = (formData.get("photoUrl") as string | null)?.trim() || null;
-  return { name, genealogicalId, generation, birthDate, birthPlace, deathDate, deathPlace, bio, photoUrl };
+  return { name, preferredName, genealogicalId, generation, birthDate, birthPlace, deathDate, deathPlace, bio, photoUrl };
 }
 
 function validate(fields: ReturnType<typeof extractFields>): string | null {

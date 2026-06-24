@@ -47,6 +47,7 @@ export default async function EditPersonPage({
           action={action}
           defaultValues={{
             name: person.name,
+            preferredName: person.preferredName,
             genealogicalId: person.genealogicalId,
             generation: person.generation,
             birthYear: birth.year,

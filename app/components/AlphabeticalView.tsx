@@ -56,6 +56,7 @@ export function AlphabeticalView({ groups }: { groups: AlphaGroup[] }) {
                     <PersonLink
                       id={p.id}
                       name={p.name}
+                      preferredName={p.preferredName}
                       photoUrl={p.photoUrl}
                       className="font-sans text-ink"
                       style={{

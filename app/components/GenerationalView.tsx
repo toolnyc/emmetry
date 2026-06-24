@@ -10,6 +10,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 export type PersonLite = {
   id: string;
   name: string | null;
+  preferredName: string | null;
   birthDate: string | null;
   deathDate: string | null;
   photoUrl: string | null;
@@ -45,6 +46,7 @@ function NameDates({ p, sub = false }: { p: PersonLite; sub?: boolean }) {
       <PersonLink
         id={p.id}
         name={p.name}
+        preferredName={p.preferredName}
         photoUrl={p.photoUrl}
         className="font-sans text-ink"
         style={{ fontSize: size, letterSpacing: "var(--tracking-name)" }}

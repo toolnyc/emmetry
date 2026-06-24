@@ -7,6 +7,7 @@ import {
   type AlphaGroup,
 } from "../components/AlphabeticalView";
 import type { PersonLite } from "../components/GenerationalView";
+import { resolveDisplayName } from "@/lib/names";
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
@@ -14,6 +15,7 @@ function toLite(p: Person): PersonLite {
   return {
     id: p.id,
     name: p.name,
+    preferredName: p.preferredName,
     birthDate: p.birthDate,
     deathDate: p.deathDate,
     photoUrl: p.photoUrl,
@@ -25,15 +27,19 @@ export default async function AlphabeticalPage() {
 
   const byLetter = new Map<string, Person[]>();
   for (const p of named) {
-    if (!p.name) continue;
-    const initial = p.name.trim().charAt(0).toUpperCase();
+    const display = resolveDisplayName(p.name, p.preferredName);
+    const initial = display.charAt(0).toUpperCase();
     const key = LETTERS.includes(initial) ? initial : "#";
     if (!byLetter.has(key)) byLetter.set(key, []);
     byLetter.get(key)!.push(p);
   }
 
   for (const list of byLetter.values()) {
-    list.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    list.sort((a, b) =>
+      resolveDisplayName(a.name, a.preferredName).localeCompare(
+        resolveDisplayName(b.name, b.preferredName)
+      )
+    );
   }
 
   const keys = [...LETTERS, ...(byLetter.has("#") ? ["#"] : [])];

@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { people, parentChild, unions } from "@/db/schema";
 import type { Person } from "@/db/schema";
 import { formatIsoDate } from "@/lib/dates";
-import { displayName } from "@/lib/names";
+import { displayName, resolveDisplayName } from "@/lib/names";
 import { LineageColumn } from "@/app/components/LineageColumn";
 import { BackButton } from "@/app/components/BackButton";
 import type { PersonLite } from "@/app/components/GenerationalView";
@@ -19,6 +19,7 @@ function toLite(p: Person): PersonLite {
   return {
     id: p.id,
     name: p.name,
+    preferredName: p.preferredName,
     birthDate: p.birthDate,
     deathDate: p.deathDate,
     photoUrl: p.photoUrl,
@@ -165,7 +166,7 @@ export default async function PersonPage({
           letterSpacing: "var(--tracking-display)",
         }}
       >
-        {displayName(person.name)}
+        {resolveDisplayName(person.name, person.preferredName)}
       </h1>
 
       <div className="mt-10 md:grid md:grid-cols-[3fr_2fr] md:gap-12">
@@ -181,6 +182,16 @@ export default async function PersonPage({
           )}
 
           <dl className="mb-10">
+            {person.preferredName && (
+              <FieldRow
+                label="Formal name"
+                value={
+                  <span className={monoValue} style={monoStyle}>
+                    {displayName(person.name)}
+                  </span>
+                }
+              />
+            )}
             {birth && (
               <FieldRow
                 label="Birth"
@@ -213,7 +224,7 @@ export default async function PersonPage({
                       className="font-mono uppercase text-ink"
                       style={monoStyle}
                     >
-                      {displayName(u.partner.name)}
+                      {resolveDisplayName(u.partner.name, u.partner.preferredName)}
                     </Link>
                     {(u.date || u.place) && (
                       <span

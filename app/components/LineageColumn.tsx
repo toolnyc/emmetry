@@ -68,6 +68,7 @@ export function LineageColumn({ sections }: { sections: LineageSection[] }) {
                       <PersonLink
                         id={p.id}
                         name={p.name}
+                        preferredName={p.preferredName}
                         photoUrl={p.photoUrl}
                         className="font-sans text-ink"
                         style={{

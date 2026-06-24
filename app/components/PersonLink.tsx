@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { displayName } from "@/lib/names";
+import { resolveDisplayName } from "@/lib/names";
 
 /**
  * On desktop, hovering a name reveals its portrait pinned to the cursor. The
@@ -13,12 +13,14 @@ import { displayName } from "@/lib/names";
 export function PersonLink({
   id,
   name,
+  preferredName,
   photoUrl,
   className,
   style,
 }: {
   id: string;
   name: string | null;
+  preferredName?: string | null;
   photoUrl?: string | null;
   className?: string;
   style?: React.CSSProperties;
@@ -68,7 +70,7 @@ export function PersonLink({
         }`}
         style={style}
       >
-        {displayName(name)}
+        {resolveDisplayName(name, preferredName)}
       </Link>
       {showPortrait && (
         <img
