@@ -43,7 +43,8 @@ export function SiteFooter() {
     });
   }, [menuOpen]);
 
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/geographical"))
+    return null;
 
   const itemClass =
     "font-mono uppercase text-on-footer hover:opacity-70 transition-opacity";

@@ -29,16 +29,16 @@ function extractFields(formData: FormData) {
     (formData.get("birthMonth") as string) ?? "",
     (formData.get("birthDay") as string) ?? ""
   );
-  const birthPlace = (formData.get("birthPlace") as string | null)?.trim() || null;
+  const birthPlaceId = (formData.get("birthPlaceId") as string | null)?.trim() || null;
   const deathDate = joinIsoParts(
     (formData.get("deathYear") as string) ?? "",
     (formData.get("deathMonth") as string) ?? "",
     (formData.get("deathDay") as string) ?? ""
   );
-  const deathPlace = (formData.get("deathPlace") as string | null)?.trim() || null;
+  const deathPlaceId = (formData.get("deathPlaceId") as string | null)?.trim() || null;
   const bio = (formData.get("bio") as string | null)?.trim() || null;
   const photoUrl = (formData.get("photoUrl") as string | null)?.trim() || null;
-  return { name, preferredName, genealogicalId, generation, birthDate, birthPlace, deathDate, deathPlace, bio, photoUrl };
+  return { name, preferredName, genealogicalId, generation, birthDate, birthPlaceId, deathDate, deathPlaceId, bio, photoUrl };
 }
 
 function validate(fields: ReturnType<typeof extractFields>): string | null {

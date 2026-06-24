@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/db";
-import { people } from "@/db/schema";
+import { people, places } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { splitIsoParts } from "@/lib/dates";
 import { PersonForm } from "../../PersonForm";
@@ -17,6 +17,15 @@ export default async function EditPersonPage({
   const { id } = await params;
   const [person] = await db.select().from(people).where(eq(people.id, id));
   if (!person) notFound();
+
+  const [birthPlaceRow, deathPlaceRow] = await Promise.all([
+    person.birthPlaceId
+      ? db.select({ id: places.id, name: places.name }).from(places).where(eq(places.id, person.birthPlaceId)).then((r) => r[0] ?? null)
+      : Promise.resolve(null),
+    person.deathPlaceId
+      ? db.select({ id: places.id, name: places.name }).from(places).where(eq(places.id, person.deathPlaceId)).then((r) => r[0] ?? null)
+      : Promise.resolve(null),
+  ]);
 
   const birth = splitIsoParts(person.birthDate);
   const death = splitIsoParts(person.deathDate);
@@ -53,11 +62,11 @@ export default async function EditPersonPage({
             birthYear: birth.year,
             birthMonth: birth.month,
             birthDay: birth.day,
-            birthPlace: person.birthPlace,
+            birthPlace: birthPlaceRow,
             deathYear: death.year,
             deathMonth: death.month,
             deathDay: death.day,
-            deathPlace: person.deathPlace,
+            deathPlace: deathPlaceRow,
             bio: person.bio,
             photoUrl: person.photoUrl,
           }}

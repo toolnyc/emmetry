@@ -9,7 +9,8 @@ type Member = { id: string; name: string };
 
 export function SiteHeader({ people }: { people: Member[] }) {
   const pathname = usePathname();
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/geographical"))
+    return null;
 
   return (
     <header className="bg-paper">

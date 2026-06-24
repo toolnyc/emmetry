@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { people, unions, parentChild } from "../db/schema";
+import { people, unions, parentChild, places } from "../db/schema";
 import type { Person } from "../db/schema";
 import { parseLegacyDate } from "../lib/dates";
 
@@ -203,16 +203,37 @@ async function main() {
   const records = parseCatalog(catalogPath);
   console.log(`Parsed ${records.length} people`);
 
-  // Separate DB fields from raw relationship strings
-  const peopleRows = records.map(({ _parentsRaw: _p, _childrenRaw: _c, _unionLines: _u, ...rest }) => rest);
+  // Collect distinct place strings and build a name→id map.
+  const distinctPlaceNames = new Set<string>();
+  for (const r of records) {
+    if (r.birthPlace) distinctPlaceNames.add(r.birthPlace);
+    if (r.deathPlace) distinctPlaceNames.add(r.deathPlace);
+  }
 
-  console.log("Clearing existing relationships and people...");
+  console.log("Clearing existing data...");
   await db.delete(unions);
   await db.delete(parentChild);
   await db.delete(people);
+  await db.delete(places);
+
+  console.log(`Inserting ${distinctPlaceNames.size} places...`);
+  const placeNameToId = new Map<string, string>();
+  const placeNames = [...distinctPlaceNames];
+  const batchSize = 50;
+  for (let i = 0; i < placeNames.length; i += batchSize) {
+    const batch = placeNames.slice(i, i + batchSize).map((name) => ({ name }));
+    const inserted = await db.insert(places).values(batch).returning({ id: places.id, name: places.name });
+    for (const row of inserted) placeNameToId.set(row.name, row.id);
+  }
+
+  // Separate DB fields; swap text place strings for FK IDs.
+  const peopleRows = records.map(({ _parentsRaw: _p, _childrenRaw: _c, _unionLines: _u, birthPlace, deathPlace, ...rest }) => ({
+    ...rest,
+    birthPlaceId: birthPlace ? (placeNameToId.get(birthPlace) ?? null) : null,
+    deathPlaceId: deathPlace ? (placeNameToId.get(deathPlace) ?? null) : null,
+  }));
 
   console.log("Inserting people...");
-  const batchSize = 50;
   for (let i = 0; i < peopleRows.length; i += batchSize) {
     const batch = peopleRows.slice(i, i + batchSize);
     await db.insert(people).values(batch);

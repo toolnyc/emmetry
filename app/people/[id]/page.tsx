@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { db } from "@/db";
-import { people, parentChild, unions } from "@/db/schema";
+import { people, parentChild, unions, places } from "@/db/schema";
 import type { Person } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { formatIsoDate } from "@/lib/dates";
 import { displayName, resolveDisplayName } from "@/lib/names";
 import { LineageColumn } from "@/app/components/LineageColumn";
@@ -27,12 +28,14 @@ function toLite(p: Person): PersonLite {
 }
 
 async function loadGraph() {
-  const [allPeople, allLinks, allUnions] = await Promise.all([
+  const [allPeople, allLinks, allUnions, allPlaces] = await Promise.all([
     db.select().from(people),
     db.select().from(parentChild),
     db.select().from(unions),
+    db.select().from(places),
   ]);
-  return { allPeople, allLinks, allUnions };
+  const placesById = new Map(allPlaces.map((p) => [p.id, p]));
+  return { allPeople, allLinks, allUnions, placesById };
 }
 
 function computeNeighborhood(
@@ -43,8 +46,9 @@ function computeNeighborhood(
     personAId: string;
     personBId: string;
     date: string | null;
-    place: string | null;
-  }[]
+    placeId: string | null;
+  }[],
+  placesById: Map<string, { id: string; name: string; lat: number | null; lng: number | null }>
 ) {
   const byId = new Map(allPeople.map((p) => [p.id, p]));
 
@@ -76,10 +80,11 @@ function computeNeighborhood(
       const partnerId = u.personAId === id ? u.personBId : u.personAId;
       const partner = byId.get(partnerId);
       if (!partner) return null;
-      return { partner, date: u.date, place: u.place };
+      const place = u.placeId ? (placesById.get(u.placeId) ?? null) : null;
+      return { partner, date: u.date, place };
     })
     .filter(
-      (u): u is { partner: Person; date: string | null; place: string | null } =>
+      (u): u is { partner: Person; date: string | null; place: { id: string; name: string; lat: number | null; lng: number | null } | null } =>
         u !== null
     );
 
@@ -122,18 +127,21 @@ export default async function PersonPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { allPeople, allLinks, allUnions } = await loadGraph();
+  const { allPeople, allLinks, allUnions, placesById } = await loadGraph();
 
   const person = allPeople.find((p) => p.id === id);
   if (!person) return <div className="px-8 py-12">Person not found.</div>;
 
   const { parents, grandparents, personUnions, children, grandchildren } =
-    computeNeighborhood(id, allPeople, allLinks, allUnions);
+    computeNeighborhood(id, allPeople, allLinks, allUnions, placesById);
 
-  const birth = [formatIsoDate(person.birthDate), person.birthPlace]
+  const birthPlace = person.birthPlaceId ? placesById.get(person.birthPlaceId) ?? null : null;
+  const deathPlace = person.deathPlaceId ? placesById.get(person.deathPlaceId) ?? null : null;
+
+  const birth = [formatIsoDate(person.birthDate), birthPlace?.name]
     .filter(Boolean)
     .join(", ");
-  const death = [formatIsoDate(person.deathDate), person.deathPlace]
+  const death = [formatIsoDate(person.deathDate), deathPlace?.name]
     .filter(Boolean)
     .join(", ");
 
@@ -197,7 +205,20 @@ export default async function PersonPage({
                 label="Birth"
                 value={
                   <span className={monoValue} style={monoStyle}>
-                    {birth}
+                    {formatIsoDate(person.birthDate)}
+                    {formatIsoDate(person.birthDate) && birthPlace ? ", " : ""}
+                    {birthPlace && (
+                      birthPlace.lat != null ? (
+                        <Link
+                          href={`/geographical?place=${birthPlace.id}`}
+                          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+                        >
+                          {birthPlace.name}
+                        </Link>
+                      ) : (
+                        birthPlace.name
+                      )
+                    )}
                   </span>
                 }
               />
@@ -207,7 +228,20 @@ export default async function PersonPage({
                 label="Death"
                 value={
                   <span className={monoValue} style={monoStyle}>
-                    {death}
+                    {formatIsoDate(person.deathDate)}
+                    {formatIsoDate(person.deathDate) && deathPlace ? ", " : ""}
+                    {deathPlace && (
+                      deathPlace.lat != null ? (
+                        <Link
+                          href={`/geographical?place=${deathPlace.id}`}
+                          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+                        >
+                          {deathPlace.name}
+                        </Link>
+                      ) : (
+                        deathPlace.name
+                      )
+                    )}
                   </span>
                 }
               />
@@ -231,7 +265,9 @@ export default async function PersonPage({
                         className="font-mono uppercase text-ghost-strong"
                         style={{ fontSize: "var(--text-date)" }}
                       >
-                        {[formatIsoDate(u.date), u.place].filter(Boolean).join(", ")}
+                        {formatIsoDate(u.date)}
+                        {formatIsoDate(u.date) && u.place ? ", " : ""}
+                        {u.place?.name}
                       </span>
                     )}
                   </span>

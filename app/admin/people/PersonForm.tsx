@@ -3,6 +3,7 @@
 import { useActionState, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { DateFields } from "./DateFields";
+import { PlacePicker } from "./PlacePicker";
 
 const GENERATIONS = [
   "Founders",
@@ -26,11 +27,11 @@ interface PersonFormProps {
     birthYear?: string;
     birthMonth?: string;
     birthDay?: string;
-    birthPlace?: string | null;
+    birthPlace?: { id: string; name: string } | null;
     deathYear?: string;
     deathMonth?: string;
     deathDay?: string;
-    deathPlace?: string | null;
+    deathPlace?: { id: string; name: string } | null;
     bio?: string | null;
     photoUrl?: string | null;
   };
@@ -178,23 +179,11 @@ export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }:
       />
 
       {/* Born place */}
-      <div>
-        <label
-          htmlFor="birthPlace"
-          className="block font-mono uppercase text-ghost-strong mb-2"
-          style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
-        >
-          Born place
-        </label>
-        <input
-          id="birthPlace"
-          type="text"
-          name="birthPlace"
-          defaultValue={defaultValues.birthPlace ?? ""}
-          className="w-full border border-rule bg-paper font-sans text-ink px-4 py-2 outline-none focus:border-ink"
-          style={{ fontSize: "var(--text-body)" }}
-        />
-      </div>
+      <PlacePicker
+        label="Born place"
+        inputName="birthPlaceId"
+        defaultValue={defaultValues.birthPlace ?? null}
+      />
 
       {/* Died */}
       <DateFields
@@ -208,23 +197,11 @@ export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }:
       />
 
       {/* Died place */}
-      <div>
-        <label
-          htmlFor="deathPlace"
-          className="block font-mono uppercase text-ghost-strong mb-2"
-          style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
-        >
-          Died place
-        </label>
-        <input
-          id="deathPlace"
-          type="text"
-          name="deathPlace"
-          defaultValue={defaultValues.deathPlace ?? ""}
-          className="w-full border border-rule bg-paper font-sans text-ink px-4 py-2 outline-none focus:border-ink"
-          style={{ fontSize: "var(--text-body)" }}
-        />
-      </div>
+      <PlacePicker
+        label="Died place"
+        inputName="deathPlaceId"
+        defaultValue={defaultValues.deathPlace ?? null}
+      />
 
       {/* Bio */}
       <div>

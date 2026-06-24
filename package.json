@@ -9,6 +9,9 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
+    "db:migrate-places": "tsx scripts/migrate-places.ts",
+    "db:geocode": "tsx scripts/geocode-places.ts",
+    "db:extract-bio-places": "tsx scripts/extract-places-from-bios.ts",
     "portraits:upload": "dotenv -e .env.local -- tsx scripts/upload-portraits.ts"
   },
   "dependencies": {
@@ -17,6 +20,7 @@
     "@vercel/blob": "^2.4.1",
     "drizzle-orm": "^0.44.1",
     "gsap": "^3.15.0",
+    "maplibre-gl": "^5.24.0",
     "next": "^15.3.3",
     "overlayscrollbars": "^2.16.0",
     "overlayscrollbars-react": "^0.5.6",
