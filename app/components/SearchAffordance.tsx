@@ -64,13 +64,21 @@ export function SearchAffordance({ people }: { people: Member[] }) {
   return (
     <div className="relative flex min-w-0 flex-1 items-center gap-4">
       <span
-        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-ink md:h-14 md:w-14"
+        className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center md:h-14 md:w-14"
         aria-hidden="true"
+        onMouseEnter={onIconEnter}
+        onMouseLeave={onIconLeave}
       >
+        {/* Circle ring — hidden until hover */}
+        <span
+          ref={circleRef}
+          className="absolute inset-0 rounded-full border border-ink"
+          style={{ opacity: 0 }}
+        />
         <svg
           viewBox="0 0 24 24"
           fill="none"
-          className="h-5 w-5 text-ink md:h-6 md:w-6"
+          className="relative h-5 w-5 text-ink md:h-6 md:w-6"
           stroke="currentColor"
           strokeWidth="1.5"
         >

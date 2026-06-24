@@ -25,7 +25,11 @@ export function Wordmark() {
 
   useLayoutEffect(() => {
     if (suffixRef.current)
-      gsap.set(suffixRef.current, { width: 0, overflow: "hidden" });
+      gsap.set(suffixRef.current, {
+        width: 0,
+        overflow: "visible",
+        clipPath: "inset(0 100% -0.4em 0)",
+      });
     if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0 });
   }, []);
 

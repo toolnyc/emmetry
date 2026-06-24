@@ -104,18 +104,12 @@ function FieldRow({
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-rule py-2">
       <span
-        className="font-sans text-ink"
+        className={`font-sans ${marker ? "text-union" : "text-ink"}`}
         style={{ fontSize: "var(--text-body)" }}
       >
         {label}
       </span>
       <span className="flex items-center gap-2 text-right">
-        {marker && (
-          <span
-            className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-union"
-            aria-hidden="true"
-          />
-        )}
         {value}
       </span>
     </div>
