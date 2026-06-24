@@ -78,9 +78,9 @@ export function Wordmark() {
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
-      {/* Name line — determines the cell height */}
+      {/* Name line — determines the cell height; inline-flex so it sizes to content */}
       <span
-        className="flex items-baseline font-sans font-[400] text-ink leading-none"
+        className="inline-flex items-baseline font-sans font-[400] text-ink leading-none"
         style={{
           fontSize: "var(--text-wordmark)",
           letterSpacing: "var(--tracking-display)",
@@ -90,16 +90,16 @@ export function Wordmark() {
         <span
           ref={suffixRef}
           className="inline-block whitespace-nowrap"
-          style={{ width: 0, overflow: "hidden", paddingRight: "0.06em" }}
+          style={{ width: 0, overflow: "hidden", paddingRight: "1.5rem" }}
         >
           mmetry
         </span>
       </span>
 
-      {/* Tagline — absolutely positioned so it never shifts the E up */}
+      {/* Tagline — hidden on mobile (no hover), absolutely positioned on desktop */}
       <span
         ref={taglineRef}
-        className="absolute left-0 font-mono uppercase text-ink whitespace-nowrap"
+        className="hidden md:block absolute left-0 font-mono uppercase text-ink whitespace-nowrap"
         style={{
           top: "calc(100% + 0.3em)",
           fontSize: "var(--text-tagline)",

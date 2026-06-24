@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import gsap from "gsap";
+import { EASE, DURATION } from "@/lib/gsap-presets";
 import { displayName } from "@/lib/names";
 
 type Member = { id: string; name: string };
@@ -19,6 +21,22 @@ export function SearchAffordance({ people }: { people: Member[] }) {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const [idx, setIdx] = useState(0);
+  const circleRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    if (circleRef.current) gsap.set(circleRef.current, { opacity: 0, scale: 0.8 });
+  }, []);
+
+  const onIconEnter = () => {
+    if (!circleRef.current) return;
+    const r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.to(circleRef.current, { opacity: 1, scale: 1, duration: r ? 0.01 : DURATION.base, ease: EASE.out });
+  };
+  const onIconLeave = () => {
+    if (!circleRef.current) return;
+    const r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.to(circleRef.current, { opacity: 0, scale: 0.8, duration: r ? 0.01 : DURATION.fast, ease: EASE.in });
+  };
 
   useEffect(() => {
     if (named.length === 0) return;
