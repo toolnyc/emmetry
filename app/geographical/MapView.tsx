@@ -269,7 +269,7 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
   const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    if (!maptilerKey || !containerRef.current || mapRef.current) return;
 
     let map: import("maplibre-gl").Map;
 
@@ -339,6 +339,19 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
           ...selectedPin.deaths.map((p) => ({ person: p, role: "death" as const })),
         ]
       : [];
+
+  if (!maptilerKey) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-paper">
+        <p
+          className="font-mono uppercase text-ghost-strong"
+          style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+        >
+          Map unavailable — NEXT_PUBLIC_MAPTILER_KEY not configured
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-full w-full">
