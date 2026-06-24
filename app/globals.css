@@ -156,9 +156,15 @@
   --os-handle-interactive-area-offset: 6px;
 }
 
-/* The rail: a 1px grey hairline centred in the track. The gradient axis differs
-   per orientation, so it can't live in a single --os-track-bg value. */
-.os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-track {
+/* The rail: a 1px grey hairline centred in the track, drawn via ::before so
+   the handle element stacks on top of it without any z-index tricks. */
+.os-scrollbar.os-theme-emmetry .os-scrollbar-track {
+  position: relative;
+}
+.os-scrollbar.os-theme-emmetry.os-scrollbar-vertical .os-scrollbar-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     to right,
     transparent calc(50% - 0.5px),
@@ -167,7 +173,10 @@
     transparent calc(50% + 0.5px)
   );
 }
-.os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-track {
+.os-scrollbar.os-theme-emmetry.os-scrollbar-horizontal .os-scrollbar-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     to bottom,
     transparent calc(50% - 0.5px),

@@ -7,6 +7,7 @@ import { formatIsoDate } from "@/lib/dates";
 import { displayName, resolveDisplayName } from "@/lib/names";
 import { LineageColumn } from "@/app/components/LineageColumn";
 import { BackButton } from "@/app/components/BackButton";
+import { PageReveal } from "@/app/components/PageReveal";
 import type { PersonLite } from "@/app/components/GenerationalView";
 
 export const dynamicParams = false;
@@ -149,9 +150,10 @@ export default async function PersonPage({
   const monoStyle = { fontSize: "var(--text-label)" } as React.CSSProperties;
 
   return (
+    <PageReveal>
     <main className="min-h-screen bg-paper px-8 py-12 md:px-16">
       {/* Top nav: Back and Home */}
-      <div className="mb-8 flex items-center gap-6">
+      <div data-reveal className="mb-8 flex items-center gap-6">
         <BackButton />
         <Link
           href="/"
@@ -168,6 +170,7 @@ export default async function PersonPage({
 
       {/* Ghosted name */}
       <h1
+        data-reveal
         className="font-sans font-[400] leading-[0.95] text-ghost-strong"
         style={{
           fontSize: "var(--text-display)",
@@ -179,7 +182,7 @@ export default async function PersonPage({
 
       <div className="mt-10 md:grid md:grid-cols-[3fr_2fr] md:gap-12">
         {/* Left: portrait, fields, bio, navigation */}
-        <div className="md:border-r md:border-rule md:pr-12">
+        <div data-reveal className="md:border-r md:border-rule md:pr-12">
           {person.photoUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -299,7 +302,7 @@ export default async function PersonPage({
         </div>
 
         {/* Right: relationship accordion */}
-        <div className="mt-12 md:mt-0">
+        <div data-reveal className="mt-12 md:mt-0">
           <LineageColumn
             sections={[
               { title: "Grandparents", members: grandparents.map(toLite) },
@@ -311,5 +314,6 @@ export default async function PersonPage({
         </div>
       </div>
     </main>
+    </PageReveal>
   );
 }

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { EASE, DURATION } from "@/lib/gsap-presets";
 import { resolveDisplayName } from "@/lib/names";
 
 /**
@@ -28,6 +30,7 @@ export function PersonLink({
   const [hovered, setHovered] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const posRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const linkRef = useRef<HTMLAnchorElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -49,10 +52,37 @@ export function PersonLink({
 
   const showPortrait = Boolean(photoUrl) && isDesktop;
 
+  const onLinkEnter = () => {
+    if (!linkRef.current) return;
+    const r =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.to(linkRef.current, {
+      opacity: 0.55,
+      y: -2,
+      duration: r ? 0.01 : DURATION.fast,
+      ease: EASE.out,
+    });
+  };
+
+  const onLinkLeave = () => {
+    if (!linkRef.current) return;
+    const r =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.to(linkRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: r ? 0.01 : DURATION.base,
+      ease: EASE.out,
+    });
+  };
+
   return (
     <span
       className="relative inline-block"
       onMouseEnter={(e) => {
+        onLinkEnter();
         if (showPortrait) {
           place(e.clientX, e.clientY);
           setHovered(true);
@@ -61,13 +91,15 @@ export function PersonLink({
       onMouseMove={(e) => {
         if (hovered) place(e.clientX, e.clientY);
       }}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => {
+        onLinkLeave();
+        setHovered(false);
+      }}
     >
       <Link
+        ref={linkRef}
         href={`/people/${id}`}
-        className={`cursor-pointer transition-opacity hover:opacity-60 ${
-          className ?? ""
-        }`}
+        className={`cursor-pointer ${className ?? ""}`}
         style={style}
       >
         {resolveDisplayName(name, preferredName)}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
@@ -84,9 +85,9 @@ export function SiteFooter() {
           );
         })}
         <span className="my-1 border-t border-on-footer/20" />
-        <span className={itemClass} style={itemStyle}>
+        <Link href="/info" className={itemClass} style={itemStyle}>
           Info
-        </span>
+        </Link>
         <Link href="/admin/people" className={itemClass} style={itemStyle}>
           Login
         </Link>
@@ -101,9 +102,9 @@ export function SiteFooter() {
       >
         {/* Desktop: Info · Login · Submit */}
         <div className="hidden md:grid grid-cols-3 items-center px-8 py-4">
-          <span className={itemClass} style={itemStyle}>
+          <Link href="/info" className={itemClass} style={itemStyle}>
             Info
-          </span>
+          </Link>
           <Link
             href="/admin/people"
             className={`${itemClass} text-center`}
