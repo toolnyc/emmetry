@@ -12,136 +12,6 @@ type Props = {
 };
 
 const INK = "#2a2a2a";
-const PAPER = "#fefdfb";
-const GHOST_STRONG = "#9b9b9b";
-const GHOST_MID = "#c7c7c7";
-const GHOST_FAINT = "#e6e6e6";
-const RULE = "#e0e0e0";
-
-// The style object uses MapLibre's runtime filter format which TypeScript's
-// strict LayerSpecification union can't fully verify statically.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildBaseStyle(maptilerKey: string): any {
-  return {
-    version: 8 as const,
-    glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${maptilerKey}`,
-    sources: {
-      maptiler: {
-        type: "vector" as const,
-        url: `https://api.maptiler.com/tiles/v3/tiles.json?key=${maptilerKey}`,
-      },
-    },
-    layers: [
-      {
-        id: "background",
-        type: "background" as const,
-        paint: { "background-color": PAPER },
-      },
-      {
-        id: "water",
-        type: "fill" as const,
-        source: "maptiler",
-        "source-layer": "water",
-        paint: { "fill-color": GHOST_FAINT },
-      },
-      {
-        id: "waterway",
-        type: "line" as const,
-        source: "maptiler",
-        "source-layer": "waterway",
-        paint: { "line-color": GHOST_FAINT, "line-width": 1 },
-      },
-      {
-        id: "landuse-park",
-        type: "fill" as const,
-        source: "maptiler",
-        "source-layer": "landuse",
-        filter: ["in", "class", "park", "cemetery", "grass", "scrub"],
-        paint: { "fill-color": "#f5f4f2" },
-      },
-      {
-        id: "road-minor",
-        type: "line" as const,
-        source: "maptiler",
-        "source-layer": "transportation",
-        filter: ["in", "class", "minor", "service", "track"],
-        minzoom: 13,
-        paint: { "line-color": RULE, "line-width": 1 },
-      },
-      {
-        id: "road-major",
-        type: "line" as const,
-        source: "maptiler",
-        "source-layer": "transportation",
-        filter: [
-          "in",
-          "class",
-          "primary",
-          "secondary",
-          "tertiary",
-          "trunk",
-          "motorway",
-        ],
-        minzoom: 8,
-        paint: { "line-color": GHOST_FAINT, "line-width": 1.5 },
-      },
-      {
-        id: "boundary-country",
-        type: "line" as const,
-        source: "maptiler",
-        "source-layer": "boundary",
-        filter: ["==", "admin_level", 2],
-        paint: { "line-color": GHOST_MID, "line-width": 1 },
-      },
-      {
-        id: "boundary-state",
-        type: "line" as const,
-        source: "maptiler",
-        "source-layer": "boundary",
-        filter: ["==", "admin_level", 4],
-        minzoom: 4,
-        paint: { "line-color": GHOST_FAINT, "line-width": 0.75, "line-dasharray": [3, 3] },
-      },
-      {
-        id: "place-country",
-        type: "symbol" as const,
-        source: "maptiler",
-        "source-layer": "place",
-        filter: ["==", "class", "country"],
-        layout: {
-          "text-field": ["get", "name:en"],
-          "text-font": ["Noto Sans Regular"],
-          "text-size": 11,
-          "text-transform": "uppercase",
-          "text-letter-spacing": 0.08,
-        },
-        paint: {
-          "text-color": GHOST_MID,
-          "text-halo-color": PAPER,
-          "text-halo-width": 1,
-        },
-      },
-      {
-        id: "place-city",
-        type: "symbol" as const,
-        source: "maptiler",
-        "source-layer": "place",
-        filter: ["in", "class", "city", "town"],
-        minzoom: 4,
-        layout: {
-          "text-field": ["get", "name:en"],
-          "text-font": ["Noto Sans Regular"],
-          "text-size": 10,
-        },
-        paint: {
-          "text-color": GHOST_STRONG,
-          "text-halo-color": PAPER,
-          "text-halo-width": 1,
-        },
-      },
-    ],
-  };
-}
 
 // Pin layers are added dynamically after the "pins" GeoJSON source is loaded.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -267,63 +137,78 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
     initialPlaceId ? (pins.find((p) => p.placeId === initialPlaceId) ?? null) : null
   );
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!maptilerKey || !containerRef.current || mapRef.current) return;
 
+    const container = containerRef.current;
     let map: import("maplibre-gl").Map;
 
-    import("maplibre-gl").then((maplibre) => {
-      map = new maplibre.Map({
-        container: containerRef.current!,
-        style: buildBaseStyle(maptilerKey),
-        center: [0, 30],
-        zoom: 2,
-        attributionControl: false,
-      });
+    import("maplibre-gl")
+      .then((maplibre) => {
+        if (!container) return;
 
-      map.addControl(
-        new maplibre.AttributionControl({ compact: true }),
-        "bottom-left"
-      );
-
-      map.on("load", () => {
-        map.addSource("pins", {
-          type: "geojson",
-          data: buildGeoJSON(pins),
+        // Use MapTiler's hosted dataviz style — minimal, light, proven to work.
+        // Custom monochrome layer overrides are added after load.
+        map = new maplibre.Map({
+          container,
+          style: `https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}`,
+          center: [0, 30],
+          zoom: 2,
+          attributionControl: false,
         });
 
-        for (const layer of PIN_LAYERS) {
-          map.addLayer(layer as Parameters<typeof map.addLayer>[0]);
-        }
+        map.addControl(
+          new maplibre.AttributionControl({ compact: true }),
+          "bottom-left"
+        );
 
-        map.on("click", ["pins-birth", "pins-death"], (e) => {
-          const feature = e.features?.[0];
-          if (!feature) return;
-          const placeId = feature.properties?.placeId as string;
-          const pin = pins.find((p) => p.placeId === placeId) ?? null;
-          setSelectedPin(pin);
+        map.on("error", (e) => {
+          console.error("[MapView] MapLibre error:", e.error);
+          setMapError(e.error?.message ?? "Map failed to load");
         });
 
-        map.on("mouseenter", ["pins-birth", "pins-death"], () => {
-          map.getCanvas().style.cursor = "pointer";
-        });
-        map.on("mouseleave", ["pins-birth", "pins-death"], () => {
-          map.getCanvas().style.cursor = "";
-        });
+        map.on("load", () => {
+          map.addSource("pins", {
+            type: "geojson",
+            data: buildGeoJSON(pins),
+          });
 
-        setMapReady(true);
-        mapRef.current = map;
-
-        // If a place was pre-selected via searchParam, fly to it.
-        if (initialPlaceId) {
-          const pin = pins.find((p) => p.placeId === initialPlaceId);
-          if (pin) {
-            map.flyTo({ center: [pin.lng, pin.lat], zoom: 8, duration: 0 });
+          for (const layer of PIN_LAYERS) {
+            map.addLayer(layer as Parameters<typeof map.addLayer>[0]);
           }
-        }
+
+          map.on("click", ["pins-birth", "pins-death"], (e) => {
+            const feature = e.features?.[0];
+            if (!feature) return;
+            const placeId = feature.properties?.placeId as string;
+            const pin = pins.find((p) => p.placeId === placeId) ?? null;
+            setSelectedPin(pin);
+          });
+
+          map.on("mouseenter", ["pins-birth", "pins-death"], () => {
+            map.getCanvas().style.cursor = "pointer";
+          });
+          map.on("mouseleave", ["pins-birth", "pins-death"], () => {
+            map.getCanvas().style.cursor = "";
+          });
+
+          setMapReady(true);
+          mapRef.current = map;
+
+          if (initialPlaceId) {
+            const pin = pins.find((p) => p.placeId === initialPlaceId);
+            if (pin) {
+              map.flyTo({ center: [pin.lng, pin.lat], zoom: 8, duration: 0 });
+            }
+          }
+        });
+      })
+      .catch((err) => {
+        console.error("[MapView] Failed to load maplibre-gl:", err);
+        setMapError("Failed to load map library");
       });
-    });
 
     return () => {
       map?.remove();
@@ -340,14 +225,14 @@ export function MapView({ pins, initialPlaceId, maptilerKey }: Props) {
         ]
       : [];
 
-  if (!maptilerKey) {
+  if (!maptilerKey || mapError) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-paper">
         <p
           className="font-mono uppercase text-ghost-strong"
           style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
         >
-          Map unavailable — NEXT_PUBLIC_MAPTILER_KEY not configured
+          {mapError ?? "Map unavailable — NEXT_PUBLIC_MAPTILER_KEY not configured"}
         </p>
       </div>
     );
