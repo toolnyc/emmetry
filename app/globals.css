@@ -43,16 +43,16 @@
   /* ---- Type roles ----
    * Display headers are fluid (clamp); small type is fixed for legibility.
    */
-  --text-display: clamp(2.5rem, 8vw, 6rem);
+  --text-display: clamp(3rem, 8vw, 6rem);
   --text-display--line-height: 0.95;
 
-  --text-wordmark: clamp(1.5rem, 2.5vw, 2rem);
+  --text-wordmark: clamp(1.75rem, 2.5vw, 2rem);
   --text-wordmark--line-height: 1;
 
-  --text-name: clamp(1.5rem, 3.5vw, 2.25rem);
+  --text-name: clamp(1.75rem, 3.5vw, 2.25rem);
   --text-name--line-height: 1.1;
 
-  --text-name-sub: clamp(1.125rem, 2.4vw, 1.5rem); /* children: one step down */
+  --text-name-sub: clamp(1.25rem, 2.4vw, 1.5rem); /* children: one step down */
   --text-name-sub--line-height: 1.1;
 
   --text-body: 1rem;

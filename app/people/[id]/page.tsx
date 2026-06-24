@@ -141,6 +141,22 @@ export default async function PersonPage({
 
   return (
     <main className="min-h-screen bg-paper px-8 py-12 md:px-16">
+      {/* Top nav: Back and Home */}
+      <div className="mb-8 flex items-center gap-6">
+        <BackButton />
+        <Link
+          href="/"
+          className="font-mono uppercase text-ghost-mid transition-colors duration-200 hover:text-ghost-strong"
+          style={{
+            fontSize: "var(--text-label)",
+            letterSpacing: "var(--tracking-nav)",
+            transitionTimingFunction: "var(--ease-standard)",
+          }}
+        >
+          Home
+        </Link>
+      </div>
+
       {/* Ghosted name */}
       <h1
         className="font-sans font-[400] leading-[0.95] text-ghost-strong"
@@ -232,20 +248,7 @@ export default async function PersonPage({
             </p>
           )}
 
-          <div className="mt-12 flex items-baseline gap-8">
-            <BackButton />
-            <Link
-              href="/"
-              className="font-sans font-[400] leading-none text-ghost-mid transition-colors duration-200 hover:text-ghost-strong"
-              style={{
-                fontSize: "var(--text-name)",
-                letterSpacing: "var(--tracking-name)",
-                transitionTimingFunction: "var(--ease-standard)",
-              }}
-            >
-              Home
-            </Link>
-          </div>
+
         </div>
 
         {/* Right: relationship accordion */}

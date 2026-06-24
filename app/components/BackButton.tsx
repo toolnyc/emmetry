@@ -8,10 +8,10 @@ export function BackButton() {
     <button
       type="button"
       onClick={() => router.back()}
-      className="font-sans font-[400] leading-none text-ghost-mid transition-colors duration-200 hover:text-ghost-strong"
+      className="font-mono uppercase text-ghost-mid transition-colors duration-200 hover:text-ghost-strong"
       style={{
-        fontSize: "var(--text-name)",
-        letterSpacing: "var(--tracking-name)",
+        fontSize: "var(--text-label)",
+        letterSpacing: "var(--tracking-nav)",
         transitionTimingFunction: "var(--ease-standard)",
       }}
     >

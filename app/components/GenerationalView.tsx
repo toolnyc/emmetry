@@ -62,16 +62,30 @@ function Couple({ couple }: { couple: CoupleUnit }) {
   const { descendant, partner, children } = couple;
   return (
     <div data-anim>
-      {/* Mobile: couple hangs off the continuous descent spine; the Union dot
-          sits on the rail itself. */}
-      <div className="flex flex-col gap-3 md:hidden">
+      {/* Mobile: flat stack; the dot has short vertical stubs extending toward
+          both names so the union relationship is visually unambiguous. The
+          horizontal rule crosses the pl-6 padding back to the spine rail. */}
+      <div className="flex flex-col gap-2 md:hidden">
         <NameDates p={descendant} />
         {partner && (
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex items-center gap-2 py-0.5">
+            {/* Horizontal rule: spine rail → dot */}
             <span
               aria-hidden="true"
-              className="absolute -left-6 h-2 w-2 -translate-x-1/2 rounded-full bg-union"
+              className="absolute left-0 top-1/2 h-px w-6 -translate-x-full -translate-y-1/2 bg-rule"
             />
+            {/* Dot with vertical stubs pointing toward both names */}
+            <span className="relative flex-shrink-0">
+              <span
+                aria-hidden="true"
+                className="absolute left-1/2 bottom-full h-4 w-px -translate-x-1/2 bg-rule"
+              />
+              <span className="block h-2 w-2 rounded-full bg-union" />
+              <span
+                aria-hidden="true"
+                className="absolute left-1/2 top-full h-4 w-px -translate-x-1/2 bg-rule"
+              />
+            </span>
             <span
               className="font-mono uppercase text-ghost-strong"
               style={{
@@ -84,6 +98,13 @@ function Couple({ couple }: { couple: CoupleUnit }) {
           </div>
         )}
         {partner && <NameDates p={partner} />}
+        {children.length > 0 && (
+          <div className="mt-2 flex flex-col gap-1 border-l border-rule pl-3">
+            {children.map((c) => (
+              <NameDates key={c.id} p={c} sub />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Desktop: couple on one non-wrapping line; children filed beneath in a
@@ -139,7 +160,7 @@ export function GenerationalView({ groups }: { groups: GenerationGroup[] }) {
               className="group block w-full cursor-pointer text-left"
             >
               <h2
-                className={`flex items-center gap-4 font-sans font-[400] leading-[0.95] transition-colors duration-200 group-hover:text-ghost-strong ${headerTone(
+                className={`font-sans font-[400] leading-[0.95] transition-colors duration-200 group-hover:text-ghost-strong ${headerTone(
                   i,
                   open
                 )}`}
@@ -149,11 +170,16 @@ export function GenerationalView({ groups }: { groups: GenerationGroup[] }) {
                   transitionTimingFunction: "var(--ease-standard)",
                 }}
               >
-                <span>{group.generation}</span>
+                {group.generation}
                 {group.year != null && (
                   <span
                     className={`font-mono ${yearTone(i, open)}`}
-                    style={{ fontSize: "0.5em", letterSpacing: "normal" }}
+                    style={{
+                      fontSize: "0.5em",
+                      letterSpacing: "normal",
+                      verticalAlign: "middle",
+                      marginLeft: "0.75em",
+                    }}
                   >
                     {group.year}
                   </span>
@@ -165,7 +191,7 @@ export function GenerationalView({ groups }: { groups: GenerationGroup[] }) {
               {group.couples.length > 0 && (
                 <div className="mt-6">
                   <div className="mb-6 border-t border-rule" />
-                  <div className="space-y-3 border-l border-ink/30 pl-6 md:space-y-4 md:border-l-0 md:pl-0">
+                  <div className="space-y-6 border-l border-ink/30 pl-6 md:space-y-4 md:border-l-0 md:pl-0">
                     {group.couples.map((couple) => (
                       <Couple key={couple.descendant.id} couple={couple} />
                     ))}

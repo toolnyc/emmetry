@@ -13,7 +13,7 @@ export function ModeNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="grid grid-cols-3 border-b border-rule px-8 py-3 md:px-16">
+    <nav className="hidden md:grid grid-cols-3 border-b border-rule px-8 py-3 md:px-16">
       {MODES.map((mode) => {
         const active =
           mode.href === "/"
