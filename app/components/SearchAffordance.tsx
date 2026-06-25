@@ -88,7 +88,7 @@ export function SearchAffordance({ people }: { people: Member[] }) {
       </span>
 
       <input
-        type="search"
+        type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setFocused(true)}

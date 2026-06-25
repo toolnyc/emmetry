@@ -91,9 +91,9 @@ export function SiteFooter() {
         <Link href="/admin/people" className={itemClass} style={itemStyle}>
           Login
         </Link>
-        <span className={itemClass} style={itemStyle}>
+        <Link href="/submit" className={itemClass} style={itemStyle}>
           Submit
-        </span>
+        </Link>
       </div>
 
       <footer
@@ -112,9 +112,13 @@ export function SiteFooter() {
           >
             Login
           </Link>
-          <span className={`${itemClass} text-right`} style={itemStyle}>
+          <Link
+            href="/submit"
+            className={`${itemClass} text-right`}
+            style={itemStyle}
+          >
             Submit
-          </span>
+          </Link>
         </div>
 
         {/* Mobile: Menu trigger */}

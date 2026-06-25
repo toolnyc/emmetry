@@ -104,7 +104,7 @@ function FieldRow({
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-rule py-2">
       <span
-        className={`font-sans ${marker ? "text-union" : "text-ink"}`}
+        className="font-sans text-ink"
         style={{ fontSize: "var(--text-body)" }}
       >
         {label}

@@ -9,27 +9,23 @@ import { EASE, DURATION } from "@/lib/gsap-presets";
  * Logo: a single "E" that expands on hover to reveal "mmetry" and the tagline.
  *
  * Layout approach:
- *  - The suffix span uses overflow:hidden + width:0 so it is *removed from
- *    layout* when hidden — the cell shrinks to just the "E".  GSAP animates
- *    width to "auto" on hover, which naturally widens the header cell.
- *  - The tagline is position:absolute so it never contributes to the cell
- *    height; the "E" therefore stays vertically centred in its container at
- *    all times.
- *  - A small paddingRight on the suffix prevents subpixel clipping of the
- *    last glyph.
+ *  - A wrapper span with overflow:hidden and width:0 hides the suffix from
+ *    both layout and view. GSAP animates the wrapper's width to the suffix's
+ *    natural pixel width (measured once on mount) on hover.
+ *  - The tagline is position:absolute so it never contributes to cell height.
  */
 export function Wordmark() {
+  const wrapperRef = useRef<HTMLSpanElement>(null);
   const suffixRef = useRef<HTMLSpanElement>(null);
   const taglineRef = useRef<HTMLSpanElement>(null);
+  const naturalWidthRef = useRef<number>(0);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   useLayoutEffect(() => {
-    if (suffixRef.current)
-      gsap.set(suffixRef.current, {
-        width: 0,
-        overflow: "visible",
-        clipPath: "inset(0 100% -0.4em 0)",
-      });
+    if (suffixRef.current) {
+      naturalWidthRef.current = suffixRef.current.offsetWidth;
+    }
+    if (wrapperRef.current) gsap.set(wrapperRef.current, { width: 0 });
     if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0 });
   }, []);
 
@@ -42,8 +38,8 @@ export function Wordmark() {
     const r = reduced();
     tlRef.current = gsap
       .timeline()
-      .to(suffixRef.current, {
-        width: "auto",
+      .to(wrapperRef.current, {
+        width: naturalWidthRef.current,
         duration: r ? 0.01 : DURATION.slow,
         ease: EASE.out,
       })
@@ -65,7 +61,7 @@ export function Wordmark() {
         ease: EASE.in,
       })
       .to(
-        suffixRef.current,
+        wrapperRef.current,
         {
           width: 0,
           duration: r ? 0.01 : DURATION.base,
@@ -82,7 +78,7 @@ export function Wordmark() {
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
-      {/* Name line — determines the cell height; inline-flex so it sizes to content */}
+      {/* Name line */}
       <span
         className="inline-flex items-baseline font-sans font-[400] text-ink leading-none"
         style={{
@@ -91,27 +87,22 @@ export function Wordmark() {
         }}
       >
         E
+        {/* overflow:hidden wrapper — collapses to 0 when hidden.
+            paddingBottom + negative marginBottom extend the clip area below
+            the baseline so descenders (e.g. "y") are never cut off. */}
         <span
-          ref={suffixRef}
-          className="inline-block whitespace-nowrap"
-          style={{ width: 0, overflow: "hidden", paddingRight: "1.5rem" }}
+          ref={wrapperRef}
+          className="inline-block overflow-hidden"
+          style={{ width: 0, paddingBottom: "0.25em", marginBottom: "-0.25em" }}
         >
-          mmetry
+          <span
+            ref={suffixRef}
+            className="inline-block whitespace-nowrap"
+            style={{ paddingRight: "0.2em" }}
+          >
+            mmetry
+          </span>
         </span>
-      </span>
-
-      {/* Tagline — hidden on mobile (no hover), absolutely positioned on desktop */}
-      <span
-        ref={taglineRef}
-        className="hidden md:block absolute left-0 font-mono uppercase text-ink whitespace-nowrap"
-        style={{
-          top: "calc(100% + 0.3em)",
-          fontSize: "var(--text-tagline)",
-          letterSpacing: "var(--tracking-tagline)",
-          opacity: 0,
-        }}
-      >
-        An Emmet Family Record
       </span>
     </Link>
   );
