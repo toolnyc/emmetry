@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { DateFields } from "./DateFields";
 import { PlacePicker } from "./PlacePicker";
+import { BioEditor } from "./BioEditor";
 
 const GENERATIONS = [
   "Founders",
@@ -206,20 +207,12 @@ export function PersonForm({ action, defaultValues = {}, submitLabel = "Save" }:
       {/* Bio */}
       <div>
         <label
-          htmlFor="bio"
           className="block font-mono uppercase text-ghost-strong mb-2"
           style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
         >
           Bio
         </label>
-        <textarea
-          id="bio"
-          name="bio"
-          defaultValue={defaultValues.bio ?? ""}
-          rows={8}
-          className="w-full border border-rule bg-paper font-sans text-ink px-4 py-2 outline-none focus:border-ink resize-y"
-          style={{ fontSize: "var(--text-body)", lineHeight: "var(--text-body--line-height)" }}
-        />
+        <BioEditor defaultValue={defaultValues.bio} />
       </div>
 
       {/* Photo */}

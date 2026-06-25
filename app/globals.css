@@ -234,3 +234,32 @@
     animation-duration: 2s;
   }
 }
+
+/* Bio HTML rendering — applies to <div class="bio-prose"> on the person page */
+.bio-prose p {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-ink);
+}
+.bio-prose p + p {
+  margin-top: 1em;
+}
+.bio-prose strong {
+  font-weight: 600;
+}
+.bio-prose em {
+  font-style: italic;
+}
+
+/* Tiptap editor content inside the admin BioEditor */
+.bio-editor .tiptap {
+  outline: none;
+  min-height: 10rem;
+}
+.bio-editor .tiptap p {
+  margin: 0;
+}
+.bio-editor .tiptap p + p {
+  margin-top: 0.75em;
+}

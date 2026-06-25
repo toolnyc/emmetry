@@ -274,15 +274,10 @@ export default async function PersonPage({
           </dl>
 
           {person.bio ? (
-            <p
-              className="font-sans text-ink whitespace-pre-line"
-              style={{
-                fontSize: "var(--text-body)",
-                lineHeight: "var(--text-body--line-height)",
-              }}
-            >
-              {person.bio}
-            </p>
+            <div
+              className="bio-prose"
+              dangerouslySetInnerHTML={{ __html: person.bio }}
+            />
           ) : (
             <p
               className="font-mono text-ghost-mid"

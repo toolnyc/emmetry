@@ -9,13 +9,21 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "Emmetry/1.0 (genealogy site; contact via github.com/emmetry)";
 const RATE_LIMIT_MS = 1100;
 
-// Hand-curated overrides for strings Nominatim can't resolve well.
+// Hand-curated overrides for strings Nominatim can't resolve well, or where it
+// returns a wrong result. null = leave coords null; object = pin to these coords.
 const OVERRIDES: Record<string, { lat: number; lng: number } | null> = {
   "at sea with the US Navy": null,
   "at sea": null,
   "unknown": null,
   "unknonwn": null,
   "killed in action over Germany (near Ulm) while in the US Army Air Force": null,
+  // Nominatim returns Mallorca for this; it's a hamlet in Otsego County, NY.
+  "Springfield Centre, NY": { lat: 42.6458, lng: -74.8375 },
+  // These lack a comma between the street and "New York", so toSearchQuery
+  // strips to bare "NY" and Nominatim lands in upstate NY.
+  "14 West 12th St. New York, NY": { lat: 40.7127, lng: -74.0060 },
+  "38th St. & 3rd Ave. New York, NY": { lat: 40.7127, lng: -74.0060 },
+  "421 Broome Street, NY": { lat: 40.7127, lng: -74.0060 },
 };
 
 function sleep(ms: number) {
