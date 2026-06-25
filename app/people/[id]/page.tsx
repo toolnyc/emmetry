@@ -104,8 +104,8 @@ function FieldRow({
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-rule py-2">
       <span
-        className="font-sans text-ink"
-        style={{ fontSize: "var(--text-body)" }}
+        className="font-mono uppercase text-ghost-strong"
+        style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
       >
         {label}
       </span>
@@ -275,7 +275,7 @@ export default async function PersonPage({
 
           {person.bio ? (
             <p
-              className="font-sans text-ink"
+              className="font-sans text-ink whitespace-pre-line"
               style={{
                 fontSize: "var(--text-body)",
                 lineHeight: "var(--text-body--line-height)",

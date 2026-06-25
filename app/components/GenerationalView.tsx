@@ -92,7 +92,7 @@ function Couple({ couple }: { couple: CoupleUnit }) {
               className="font-mono uppercase text-ghost-strong"
               style={{
                 fontSize: "var(--text-tagline)",
-                letterSpacing: "var(--tracking-nav)",
+                letterSpacing: "var(--tracking-tagline)",
               }}
             >
               Union
