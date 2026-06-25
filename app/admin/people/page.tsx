@@ -38,13 +38,22 @@ export default async function AdminPeoplePage({
           >
             Admin — People
           </h1>
-          <Link
-            href="/admin/people/new"
-            className="font-mono uppercase text-ink border border-rule px-4 py-2"
-            style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
-          >
-            + Add person
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="font-mono uppercase text-ghost-strong hover:text-ink transition-colors"
+              style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+            >
+              ← Site
+            </Link>
+            <Link
+              href="/admin/people/new"
+              className="font-mono uppercase text-ink border border-rule px-4 py-2"
+              style={{ fontSize: "var(--text-label)", letterSpacing: "var(--tracking-nav)" }}
+            >
+              + Add person
+            </Link>
+          </div>
         </div>
 
         {/* Search */}
