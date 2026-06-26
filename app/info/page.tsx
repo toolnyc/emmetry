@@ -43,7 +43,7 @@ export default function InfoPage() {
             birthplaces — in one navigable record.
           </p>
           <p className="font-sans text-ink">
-            The site was originally built by Jesse Emmet and went offline around
+            The site was originally built in the 2000s and went offline around
             2021. This version is a faithful reconstruction, drawing on content
             recovered from the Wayback Machine, with the same 133 individuals
             and their records carried forward.
