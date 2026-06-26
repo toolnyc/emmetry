@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 
   try {
     await resend.emails.send({
-      from: "Emmetry <onboarding@resend.dev>",
-      to: "admin@tool.nyc",
+      from: "Emmetry <admin@updates.emmetry.org>",
+      to: "admin@emmetry.org",
       replyTo: email,
       subject: `[Emmetry] ${typeLabel} from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nType: ${typeLabel}\n\n${message}`,
